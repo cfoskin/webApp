@@ -1,0 +1,30 @@
+ body {
+      padding-top: 20px;
+      height: 100%;
+      margin: 0;
+    }
+
+    .phones {
+      list-style: none;
+    }
+
+    .thumb {
+      float: left;
+      margin: -0.5em 1em 1.5em 0;
+      padding-bottom: 1em;
+      height: 100px;
+      width: 100px;
+    }
+
+    .phones li {
+      height: 95px;
+      padding-top: 15px;
+    }
+#footer {
+    bottom:0;
+    width: 100%;
+}
+#register{
+  width: 66%;
+  height: 33%;
+}
