@@ -4,21 +4,31 @@
  <div class="panel panel-info">
   <div class="panel-heading">
     <h3 class="panel-title">
-      <b>Your Existing Account Details.</b>
+      <b>All Registered Users</b>   
     </h3>
   </div>
   <div class="panel-body">
-    <ul class="list-group">
-      <li class="list-group-item">
-       First Name:
-     </li>
-     <li class="list-group-item">
-      Last Name:
-    </li>
-    <li class="list-group-item">
-      Delivery Address:
-    </li>
-  </ul>
+      <table class="table table-bordered">
+        <tr><th>Name</th><th>Last Name</th><th>Address</th><th>Email</th></tr> 
+              <tr>
+                <td>
+                  {{loggedInUser.name}}
+                </td>
+                <td>
+                  {{loggedInUser.lastName}}
+                </td>
+                <td>
+                  {{loggedInUser.address }}
+                </td>
+                <td>
+                  {{loggedInUser.email }}
+                </td>
+         </tr>
+       </table>
+       <button type="submit" ng-click="logOut()" class="btn btn-danger pull-right">
+        Log Out!
+      </button>
+  </div>
 </div>
 </div>
 </div>
