@@ -7,11 +7,10 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       templateUrl: '/myApp/views/partials/homePage.html',
       controller:  'homePageController'
     })
-    .when('/products', {
-      templateUrl: '/myApp/views/partials/products.html',
-      //controller:  'registerController'
-
-    })
+   .when('/products', {
+            templateUrl: '/myApp/views/partials/products.html',
+            controller: 'ProductPageController'
+          })
     .when('/register', {
       templateUrl: '/myApp/views/partials/register.html',
       controller:  'registerController'
@@ -25,11 +24,6 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       templateUrl: '/myApp/views/partials/account.html',
       controller:  'accountController',
     })
-    .when('/account/:user_index',
-    {
-      templateUrl: '/myApp/views/partials/account.html',
-      controller: 'accountController'
-    })
     .otherwise({
       redirectTo: '/'
     })
@@ -37,7 +31,6 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
     // use the HTML5 History API
     $locationProvider.html5Mode(true);
   }]);
-
 
 //A service for storing user Authentication
 eCommerceApp.service('AuthenticationService', function (StorageService) {
@@ -86,6 +79,19 @@ eCommerceApp.service('StorageService', function () {
   }
 })
 
+//A service for the phones
+eCommerceApp.service('PhoneService', ['$http' , function($http){
+  var api = {
+    getPhones : function() {
+      return $http.get('/myApp/phones/phones.json')            
+    }, 
+                getPhone : function(id) {  // NEW
+                 return $http.get('/myApp/phones/' + id + '.json')
+               }
+             }
+             return api
+  }]);
+
 
 eCommerceApp.controller('homePageController', 
   function ($scope, $location, AuthenticationService) {
@@ -97,6 +103,17 @@ eCommerceApp.controller('homePageController',
       }
     }
   });
+
+
+eCommerceApp.controller('ProductPageController', 
+        ['$scope', 'PhoneService',
+          function($scope, PhoneService) {
+             PhoneService.getPhones().success(function(data) {
+                   $scope.phones = data
+                 })
+             $scope.orderProp = 'age';
+          }]);
+
 
 eCommerceApp.controller('shoppingCartController', 
  function ($scope,$location,AuthenticationService) {
@@ -125,12 +142,13 @@ eCommerceApp.controller('accountController',
 });
 
 eCommerceApp.controller('registerController', function ($scope,AuthenticationService) {
-  $scope.users = AuthenticationService.getUsers()
+  $scope.users = AuthenticationService.getUsers();
   $scope.addUser = function () {
     AuthenticationService.addUser($scope.newUser);
     $scope.newUser = {}
   }
 });
+
 
 function User(data) {
   this.name = data.name || '',
