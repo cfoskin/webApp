@@ -2,7 +2,7 @@
 	<div class="panel panel-info">
 		<div class="panel-heading" align="center">
 			<h1 class="panel-title">
-             <b>View Our Latest Products Here</b>
+             <b>Our Latest Products</b>
 			</h1>
 				<select ng-model="orderProp">
 					<option value="name">Alphabetical</option>
@@ -12,10 +12,9 @@
 		<div class="panel-body">
   <div class="col-md-12">
   	<ul  class="phones">
-  		<li ng-repeat="phone in phones | filter:{name: query } | orderBy:orderProp" class="thumbnail">
-  	         <p><img ng-src="{{phone.imageUrl}}" class="thumb"></p>
-  			<p>{{phone.name}}</p>
-  			<p>{{phone.snippet}}</p>
+  		<li ng-repeat="phone in phones | filter:{name: query } | orderBy:orderProp | limitTo:quantity" class="thumbnail">
+  	         <a href="/products" class="thumb"><img ng-src="{{phone.imageUrl}}" ></a>
+  			<a href="/products" class="thumb">{{phone.name}}</a>
   		</li>
   	</ul>
   </div>

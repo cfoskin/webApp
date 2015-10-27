@@ -3,14 +3,14 @@ var eCommerceApp = angular.module('eCommerceApp', ['ngRoute']);
 eCommerceApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider
-    .when('/', {
+    .when('/home', {
       templateUrl: '/myApp/views/partials/homePage.html',
-      controller:  'homePageController'
+      controller:  'homePageController' 
     })
-   .when('/products', {
-            templateUrl: '/myApp/views/partials/products.html',
-            controller: 'ProductPageController'
-          })
+    .when('/products', {
+      templateUrl: '/myApp/views/partials/products.html',
+      controller: 'ProductPageController'
+    })
     .when('/register', {
       templateUrl: '/myApp/views/partials/register.html',
       controller:  'registerController'
@@ -25,7 +25,7 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       controller:  'accountController',
     })
     .otherwise({
-      redirectTo: '/'
+      redirectTo: '/home'
     })
 
     // use the HTML5 History API
@@ -35,6 +35,9 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
 //A service for storing user Authentication
 eCommerceApp.service('AuthenticationService', function (StorageService) {
   this.loggedInUser = null;
+  isUserLoggedIn = false;
+
+  debugger;
   var users = StorageService.getUsers();
   
   this.getUsers = function () {
@@ -50,6 +53,7 @@ eCommerceApp.service('AuthenticationService', function (StorageService) {
   users.forEach(function(user) {
     if(user.yourCredentials(email, password))
       this.loggedInUser = user;
+    isUserLoggedIn = true;
   }.bind(this));
 
 }
@@ -80,21 +84,18 @@ eCommerceApp.service('StorageService', function () {
 })
 
 //A service for the phones
-eCommerceApp.service('PhoneService', ['$http' , function($http){
+eCommerceApp.factory('PhoneService', ['$http' , function($http){
   var api = {
     getPhones : function() {
-      return $http.get('/myApp/phones/phones.json')            
-    }, 
-                getPhone : function(id) {  // NEW
-                 return $http.get('/myApp/phones/' + id + '.json')
-               }
-             }
-             return api
-  }]);
+      return $http.get('/myApp/phones/phones.json')
+    }
+  }
+  return api
+}]);
 
 
 eCommerceApp.controller('homePageController', 
-  function ($scope, $location, AuthenticationService) {
+  function ($scope, $location, AuthenticationService,PhoneService) {
     $scope.logIn = {};
     $scope.logIn = function () {
       AuthenticationService.logIn($scope.logIn.email, $scope.logIn.password );
@@ -102,17 +103,31 @@ eCommerceApp.controller('homePageController',
         $location.path('/account')
       }
     }
+
+    PhoneService.getPhones().success(function(data) {
+     $scope.phones = data
+     $scope.phones.map(function(phoneData) {
+      return new Phone(phoneData);
+    });
+   })
+    $scope.orderProp = 'age';
+    $scope.quantity = 2;
   });
 
 
 eCommerceApp.controller('ProductPageController', 
-        ['$scope', 'PhoneService',
-          function($scope, PhoneService) {
-             PhoneService.getPhones().success(function(data) {
-                   $scope.phones = data
-                 })
-             $scope.orderProp = 'age';
-          }]);
+  function ($scope,$location,PhoneService, AuthenticationService) {   
+   PhoneService.getPhones().success(function(data) {
+     $scope.phones = data
+
+     $scope.phones.map(function(phoneData) {
+      return new Phone(phoneData);
+    });
+
+   })
+   $scope.orderProp = 'age';
+   $scope.loggedInUser = AuthenticationService.loggedInUser;
+ });
 
 
 eCommerceApp.controller('shoppingCartController', 
@@ -145,7 +160,7 @@ eCommerceApp.controller('registerController', function ($scope,AuthenticationSer
   $scope.users = AuthenticationService.getUsers();
   $scope.addUser = function () {
     AuthenticationService.addUser($scope.newUser);
-    $scope.newUser = {}
+    $scope.newUser = new User({});
   }
 });
 
@@ -156,8 +171,19 @@ function User(data) {
   this.email = data.email || '',
   this.address = data.address || '',
   this.password = data.password || '',
+  this.myCartItems = null || [],
+
 
   this.yourCredentials = function(email, password) {
     return email === this.email && password === this.password;
   }
 }
+
+
+function Phone(data) {
+  this.age = data.age || '',
+  this.id = data.id || '',
+  this.imageUrl = data.imageUrl || '',
+  this.name = data.name || '',
+  this.snippet = data.snippet || ''
+};
