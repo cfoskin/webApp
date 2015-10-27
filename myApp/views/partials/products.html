@@ -1,32 +1,35 @@
-
+<br><br><br>
 <div class="panel panel-info">
 	<div class="panel-heading" align="center">
-		<h2 class="panel-title">
-			<b>Latest Products
-		</h2>
-	</div>
-	<div class="panel-body">
-		<ul class="list-group">
-			<li class="list-group-item">
-			<button type="submit" class="btn btn-primary btn-xs pull-right">
-					View Now
-				</button>
-				item 1
-				
-			</li>
-			<li class="list-group-item">
-				item 2
-				<button type="submit" class="btn btn-primary btn-xs pull-right">
-					View Now
-				</button>
-				<b>
-				</li>
-				<li class="list-group-item">
-					item 3
-					<button type="submit" class="btn btn-primary btn-xs pull-right">
-						View Now
-					</button>
-				</li>
-			</ul>
+		<h1 class="panel-title">
+			<b>Products
+			</h1>
+		</div>
+		<div class="panel-body">
+			<div class="container" >
+				<div class="row">
+					<div class="col-sm-6 col-sm-offset-2">
+						<h3>Products - Name search</h3> 
+						<input type="text" ng-model="search.name" placeholder="Product Name">
+						<table class="table table-bordered">
+							<tr><th>Name</th><th>Price (EUR$)</th><th>Qty.</th></tr> 
+							<!-- <tr ng-repeat="product in products | filter:search" >
+								<td>
+									{{product.name}}
+								</td>
+								<td>
+									{{product.price | currency:"" }}
+								</td>
+								<td>
+									{{product.quantity }}
+								</td>
+							</tr> -->
+						</table>
+					</div>
+				</div> 
+			</div>
+
 		</div>
 	</div>
+	<hr>
+	<br>

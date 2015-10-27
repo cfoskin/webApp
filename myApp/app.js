@@ -7,6 +7,11 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       templateUrl: '/myApp/views/partials/homePage.html',
       controller:  'homePageController'
     })
+    .when('/products', {
+      templateUrl: '/myApp/views/partials/products.html',
+      //controller:  'registerController'
+
+    })
     .when('/register', {
       templateUrl: '/myApp/views/partials/register.html',
       controller:  'registerController'
