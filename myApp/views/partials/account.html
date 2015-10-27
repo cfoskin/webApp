@@ -1,78 +1,48 @@
-
-<div class="col-md-4">
- <br><br>
- <div class="panel panel-info">
-  <div class="panel-heading">
-    <h3 class="panel-title">
-      <b>All Registered Users</b>   
+<br>
+<div class="container" align="center">
+  <div class="page-header">
+    <h3 align="center">
+      <div>
+      </div>
+      Welcome <i>{{loggedInUser.name | uppercase }} </i>To Your Account Page.
     </h3>
   </div>
-  <div class="panel-body">
-      <table class="table table-bordered">
-        <tr><th>Name</th><th>Last Name</th><th>Address</th><th>Email</th></tr> 
-              <tr>
-                <td>
-                  {{loggedInUser.name}}
-                </td>
-                <td>
-                  {{loggedInUser.lastName}}
-                </td>
-                <td>
-                  {{loggedInUser.address }}
-                </td>
-                <td>
-                  {{loggedInUser.email }}
-                </td>
-         </tr>
-       </table>
-       <button type="submit" ng-click="logOut()" class="btn btn-danger pull-right">
-        Log Out!
-      </button>
-  </div>
-</div>
-</div>
-</div>
+  <br>
 
-<div class="col-md-4">
- <br><br>
- <div class="panel panel-info">
-  <div class="panel-heading">
-    <h3 class="panel-title">
-      <b>
-        Enter new Details
-      </b>
-    </h3>
-  </div>
-  <div class="panel-body">
-    <div class="form-group">
-      &nbsp;
-      <span class="badge"></span>
-      <span class="badge">First Name</span>
-      <input type="text" class="form-control" placeholder="First Name">
-    </div>
-    <div class="form-group">
-      <label>
-      </label>
-      <span class="badge">Last Name</span>
-      <input type="text" class="form-control" placeholder="Last Name">
-    </div>
-    <div class="form-group">
-      <label>
-      </label>
-      <span class="badge">Delivery Address</span>
-      <textarea class="form-control"></textarea>
-    </div>
-    <div class="form-group">
-      <div class="form-group">
-        <span class="badge"></span>
+  <div class="row">
+    <div class="col-md-4">
+     <br><br>
+     <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <b>Your User Details</b>   
+        </h3>
+      </div>
+      <div class="panel-body">
+        <table class="table table-bordered">
+          <tr><th>Name</th><th>Last Name</th><th>Address</th><th>Email</th></tr> 
+          <tr>
+            <td>
+              {{loggedInUser.name}}
+            </td>
+            <td>
+              {{loggedInUser.lastName}}
+            </td>
+            <td>
+              {{loggedInUser.address }}
+            </td>
+            <td>
+              {{loggedInUser.email }}
+            </td>
+          </tr>
+        </table>
+        <button type="submit" ng-click="logOut()" class="btn btn-danger pull-right">
+          Log Out!
+        </button>
       </div>
     </div>
-    <button type="submit" class="btn btn-success pull-right">
-      Edit!
-    </button>
   </div>
-</div>
-</div>
+
 
 <div class="col-md-4">
   <br><br>
@@ -83,18 +53,36 @@
       </h3>
     </div>
     <div class="panel-body">
-      <div class="form-group">
-        &nbsp;
-        <span class="badge">Enter New Password</span>
-        <input type="password" class="form-control" placeholder="New password">
-      </div>
-      <div class="form-group">
-        <span class="badge">Confirm New Password</span>
-        <input type="password" class="form-control" placeholder="Confirm Password">
-      </div>
-      <button type="submit" class="btn btn-success pull-right">
-        Edit!
-      </button>
+      <form ng-submit="updateUser()">
+        <div class="form-group">
+        <br>
+          <span class="badge">Enter New Password</span>
+          <input type="password" class="form-control" ng-model="loggedInUser.password" placeholder="Confirm Password">
+        </div>
+        <br>
+        <input type="submit" class="btn btn-danger"  value="Change Password"> 
+      </form>
     </div>
   </div>
+</div>
+
+  <div class="col-md-4">
+   <br><br>
+   <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <b>
+         Orders Completed
+       </b>
+     </h3>
+   </div>
+   <div class="panel-body">
+
+   </div>
+ </div>
+</div>
+
+
+
+
 </div>

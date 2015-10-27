@@ -4,7 +4,7 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider
     .when('/', {
-      templateUrl: '/myApp/views/partials/grid.html',
+      templateUrl: '/myApp/views/partials/homePage.html',
       controller:  'homePageController'
     })
     .when('/register', {
@@ -14,6 +14,7 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
     })
     .when('/shoppingCart', {
       templateUrl: '/myApp/views/partials/shoppingCart.html',
+      controller: 'shoppingCartController'
     })
     .when('/account', {
       templateUrl: '/myApp/views/partials/account.html',
@@ -42,17 +43,10 @@ eCommerceApp.service('AuthenticationService', function (StorageService) {
     return users;
   }
 
-  this.getUser = function (index) {
-    if (index >=0 && index < users.length ) {
-     return users[index]
-   }
-   return undefined
+  this.addUser = function(userData) {
+   users.push(new User(userData));
+   StorageService.saveUsers(users);
  }
-
- this.addUser = function(userData) {
- users.push(new User(userData));
- StorageService.saveUsers(users);
-}
 
  this.logIn = function(email, password) {
   users.forEach(function(user) {
@@ -63,14 +57,13 @@ eCommerceApp.service('AuthenticationService', function (StorageService) {
 }
 
 this.logOut = function() {
-   this.loggedInUser = null;
+ this.loggedInUser = null;
 }
 
-this.updateUser = function(index,user) {
- users[index].name = user.name
- users[index].lastName = user.lastName
- users[index].email = user.email
+this.updateUser = function(user) {
+  user.password = user.password
 }
+
 });
 
 
@@ -88,6 +81,7 @@ eCommerceApp.service('StorageService', function () {
   }
 })
 
+
 eCommerceApp.controller('homePageController', 
   function ($scope, $location, AuthenticationService) {
     $scope.logIn = {};
@@ -97,19 +91,21 @@ eCommerceApp.controller('homePageController',
         $location.path('/account')
       }
     }
-    $scope.userNoInRange = function () {
-      return  $scope.userNo && $scope.userNo >=0 
-      && $scope.userNo < $scope.users.length
-    }
-  })
+  });
+
+eCommerceApp.controller('shoppingCartController', 
+ function ($scope,$location,AuthenticationService) {
+  $scope.loggedInUser = AuthenticationService.loggedInUser;
+  if( $scope.loggedInUser === null){
+    $location.path('/')
+  }
+});
 
 eCommerceApp.controller('accountController', 
  function ($scope,$location,$routeParams, AuthenticationService) {
   $scope.loggedInUser = AuthenticationService.loggedInUser;
-
-  $scope.user = {  
-    index : $routeParams.user_index, 
-    detail : AuthenticationService.getUser($routeParams.user_index)
+  if( $scope.loggedInUser === null){
+    $location.path('/')
   }
 
   $scope.logOut = function () {
@@ -118,11 +114,11 @@ eCommerceApp.controller('accountController',
   }
 
   $scope.updateUser = function () {
-   AuthenticationService.updateUser($scope.user.index, 
-     $scope.user.detail )
-   $location.path('/account')
+   AuthenticationService.updateUser($scope.loggedInUser);
+   this.logOut();
  }
-})
+});
+
 eCommerceApp.controller('registerController', function ($scope,AuthenticationService) {
   $scope.users = AuthenticationService.getUsers()
   $scope.addUser = function () {
