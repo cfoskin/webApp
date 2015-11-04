@@ -1,52 +1,38 @@
 <br>
 <div class="container" align="center">
-<div class="page-header">
-  <h3 align="center">
-    <div>
-    </div>
-    Welcome To <i>{{loggedInUser.name | uppercase }} </i>'s Shopping Cart Page.
-  </h3>
-</div>
-<br>
-   <div class="panel panel-info" id="cart-panel">
-      <div class="panel-heading">
-        <h3 class="panel-title">
-          <b>Your Shopping Cart</b>
-        </h3>
+  <div class="page-header">
+    <h3 align="center">
+      <div>
       </div>
-      <div class="panel-body">
-        <ul class="list-group">
-          <li class="list-group-item">
-            item 1
-            <button type="submit" class="btn btn-success btn-xs pull-center">
-              Buy Now
+      Welcome To <i>{{loggedInUser.name | uppercase }} </i>'s Shopping Cart Page.
+    </h3>
+  </div>
+  <br>
+  <div class="panel panel-info" id="cart-panel">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <b>Your Shopping Cart</b>
+      </h3>
+    </div>
+
+    <div class="panel-body">
+      <div class="col-md-12">
+        <ul  class="phones">
+          <li ng-repeat="phone in loggedInUser.myCartItems" class="thumbnail">
+            <p><img ng-src="{{phone.imageUrl}}" class="thumb"></p>     
+            <h4><b>{{phone.name}}<b></h4>
+            <button type="submit" ng-click = "removeFromCart($event)" id="{{phone.id}}"  class="btn btn-danger btn-xs pull-right">
+              Remove From Cart
             </button>
-            <button type="submit" class="btn btn-danger btn-xs pull-right">
-              Remove
-            </button>
+          <p> &euro; <span class="label label-info" ng-bind ="{{phone.price}}" ></span></p>
           </li>
-          <li class="list-group-item">
-            item 2
-            <button type="submit" class="btn btn-success btn-xs pull-center">
-              Buy Now
-            </button>
-            <b></b>
-            <button type="submit" class="btn btn-danger pull-right btn-xs">
-              Remove
-            </button>
-          </li>
-          <li class="list-group-item">
-            item 3
-            <button type="submit" class="btn btn-success btn-xs pull-center">
-              Buy Now
-            </button>
-            <button type="submit" class="btn btn-danger pull-right btn-xs">
-              Remove
-            </button>
-          </li>
+          <button type="submit" ng-click = "checkOut()" class="btn btn-success btn-lg">
+            Check Out
+          </button> 
         </ul>
       </div>
     </div>
   </div>
+</div>
 
-  <br><br><br>
+<br><br><br>

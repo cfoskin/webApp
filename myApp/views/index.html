@@ -16,23 +16,21 @@
 		margin: auto;
 	}
 </style>
-<div ng-include="'./partials/navbar.html'">
-</div>
 </head>
-
 <div class="container">
 	<body>
+		<navbar-directive></navbar-directive>
 		<div class="row">
-				
-
 			<div ng-view ></div>
-
 		</div>
-		<div ng-include="'./partials/footer.html'">
-		</div>
+		<footer-directive></footer-directive>
 		<script src="../../support/angular.js"></script> 
-			<script type='text/javascript' src='../../jsLibraries/infinite-scroll.min.js'></script>
+		<script type='text/javascript' src='../../jsLibraries/infinite-scroll.min.js'></script>
 		<script src="../../support/angular-route.js"></script>
+		<script src='../../jsLibraries/lodash.min.js'></script>
+		<script src='../../jsLibraries/angular-simple-logger.js'></script>
+		<script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
+		<script src='../../jsLibraries/angular-google-maps.js'></script>
 		<script src="../app.js"></script>
 	</body>
 </div>

@@ -17,9 +17,10 @@
 			<div class="col-md-12">
 				<ul  class="phones">
 					<li ng-repeat="phone in phones | filter:{name: query } | orderBy:orderProp" class="thumbnail">
-						<p><img ng-src="{{phone.imageUrl}}" class="thumb"></p>
-						<button class="btn btn-success pull-right" btn-xs>Add To Cart
+				 <a href="/phones/{{phone.id}}" class="thumb"><img ng-src="{{phone.imageUrl}}"></a>
+				<button class="btn btn-success pull-right" type="submit" ng-click = "addToCart($event)" id="{{phone.id}}" btn-xs>Add To Cart
 						</button>
+						<p> &euro; <span class="badge" ng-bind="phone.price"></span></p>
 						<p>{{phone.name}}</p>
 						<p>{{phone.snippet}}</p>
 					</li>
@@ -29,4 +30,4 @@
 
 	</div>
 </div>
-   
+

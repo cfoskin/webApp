@@ -44,27 +44,27 @@
   </div>
 
 
-<div class="col-md-4">
-  <br><br>
-  <div class="panel panel-info">
-    <div class="panel-heading">
-      <h3 class="panel-title">
-        <b>Change Password</b>
-      </h3>
-    </div>
-    <div class="panel-body">
-      <form ng-submit="updateUser()">
-        <div class="form-group">
-        <br>
-          <span class="badge">Enter New Password</span>
-          <input type="password" class="form-control" ng-model="loggedInUser.password" placeholder="Confirm Password">
-        </div>
-        <br>
-        <input type="submit" class="btn btn-danger"  value="Change Password"> 
-      </form>
+  <div class="col-md-4">
+    <br><br>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <b>Change Password</b>
+        </h3>
+      </div>
+      <div class="panel-body">
+        <form ng-submit="updateUser()">
+          <div class="form-group">
+            <br>
+            <span class="badge">Enter New Password</span>
+            <input type="password" class="form-control" ng-model="loggedInUser.password" placeholder="Confirm Password">
+          </div>
+          <br>
+          <input type="submit" class="btn btn-danger"  value="Change Password"> 
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
   <div class="col-md-4">
    <br><br>
@@ -77,12 +77,16 @@
      </h3>
    </div>
    <div class="panel-body">
-
-   </div>
- </div>
+    <div class="col-md-12">
+      <ul  class="phones">
+        <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail">
+          <p><b>Order no.{{order.orderNum}}: {{order.orderedProduct.name}}</b></p>
+          <p>Order Total: &euro;{{order.orderPrice}}</p>
+          <p><b>Status: <span style="color:red"> {{order.orderStatus}}</span></b></p>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>
-
-
-
-
+</div>
 </div>
