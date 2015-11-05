@@ -9,13 +9,14 @@ role="navigation">
 			<a href="/products">Products</a>
 		</li>
 		<li>
-			<a href="/shoppingCart">Shopping Cart</a>
-		</li>
-		<li>
-			<a href="/account">Account</a>
-		</li>
-		<li>
-			<a href="/register" >Register</a>
+			<a href="#" data-toggle="dropdown" class="dropdown-toggle">Account</a>
+			<ul class="dropdown-menu">
+				<li><a href="/account">Account Details</a></li>
+				<li><a href="/shoppingCart" >Shopping Cart</a></li>
+				<li><a href="/register" >Register</a></li>
+				<li><a href="/" >Sign In</a></li>
+				<li><a href="#" ng-click="logOut()" >Sign Out</a></li>
+			</ul>
 		</li>
 	</ul>
 </div>

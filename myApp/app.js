@@ -11,6 +11,9 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       templateUrl: '/myApp/views/partials/products.html',
       controller: 'ProductPageController'
     })
+    .when('/landingPage', {
+      templateUrl: '/myApp/views/partials/landingPage.html',
+    })
     .when('/phones/:phoneId', {
       templateUrl: '/myApp/views/partials/phone-detail.html',
       controller: 'PhoneDetailCtrl'
@@ -41,34 +44,46 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
   }]);
 
 //A service for storing user User Authentication
-eCommerceApp.service('AuthenticationService', function (StorageService) {
+eCommerceApp.service('AuthenticationService', function (StorageService, $location) {
   this.loggedInUser = null;
-  isUserLoggedIn = false;
+  this.isUserLoggedIn = false;
   var users = StorageService.getUsers();
   this.getUsers = function () {
     return users;
   }
 
+  this.checkAlreadyReg = function(userData){
+    var result = false;
+    users.some(function(user){
+      if(user.email === userData.email){
+        result = true;
+      }
+      else{
+        result = false;
+      }
+    })
+    return result;
+  }
+
   this.registerUser = function(userData) {
    users.push(new User(userData));
-   StorageService.saveUsers(users);
+    // StorageService.saveUsers(users);
+  }
+
+  this.logIn = function(email, password) {
+    users.forEach(function(user) {
+      if(user.yourCredentials(email, password))
+        this.loggedInUser = user;
+      isUserLoggedIn = true;
+    }.bind(this));
+
+  }
+  this.logOut = function() {
+   this.loggedInUser = null;
+   isUserLoggedIn = false;
  }
-
- this.logIn = function(email, password) {
-  users.forEach(function(user) {
-    if(user.yourCredentials(email, password))
-      this.loggedInUser = user;
-    isUserLoggedIn = true;
-  }.bind(this));
-
-}
-
-this.logOut = function() {
- this.loggedInUser = null;
-}
-
-this.updateUser = function(user) {
-  user.password = user.password
+ this.updateUser = function(user, newPassword) {
+    user.password = newPassword;
 }
 
 });
@@ -122,14 +137,16 @@ eCommerceApp.controller('HomePageController',
   function ($scope, $location, AuthenticationService,PhoneService) {
     $scope.logIn = {};
     //REMOVE AT END!!!!!!
-    AuthenticationService.loggedInUser = AuthenticationService.getUsers()[0];
+    //AuthenticationService.loggedInUser = AuthenticationService.getUsers()[0];
     $scope.logIn = function () {
+      if(AuthenticationService.isUserLoggedIn){
+        AuthenticationService.loggedInUser = null;
+      }
       AuthenticationService.logIn($scope.logIn.email, $scope.logIn.password );
       if (AuthenticationService.loggedInUser){
         $location.path('/account')
       }
     }
-
     $scope.phones = PhoneService.getPhones();
     $scope.orderProp = 'age';
     $scope.quantity = 2;
@@ -139,7 +156,7 @@ eCommerceApp.controller('AccountController',
  function ($scope,$location,$routeParams, AuthenticationService) {
   $scope.loggedInUser = AuthenticationService.loggedInUser;
   if( $scope.loggedInUser === null){
-   alert("Please log in or create and account to view your account page!");
+   //alert("Please log in or create and account to view your account page!");
    $location.path('/')
  }
 
@@ -149,28 +166,44 @@ eCommerceApp.controller('AccountController',
 }
 
 $scope.updateUser = function () {
- AuthenticationService.updateUser($scope.loggedInUser);
- this.logOut();
+  if($scope.password1 === $scope.password2){
+      AuthenticationService.updateUser($scope.loggedInUser, $scope.password1);
+      alert("Password Changed! - Please log in again");
+      this.logOut();
+  }
+  else{
+    alert("passwords do not match");
+  }
 }
 });
 
 eCommerceApp.controller('RegisterController', function ($scope,AuthenticationService,$location) {
   $scope.users = AuthenticationService.getUsers();
   $scope.registerUser = function () {
-    AuthenticationService.registerUser($scope.newUser);
-    $scope.newUser = new User({});
-    $location.path('/')
+    if(AuthenticationService.checkAlreadyReg($scope.newUser)){
+      alert("This email address is already registered - Please try again");
+      $location.path('/register');
+    }
+    else{
+      AuthenticationService.registerUser($scope.newUser);
+      $location.path('/');
+    }
   }
 });
 
 eCommerceApp.controller('ProductPageController', 
   function ($scope,$location,PhoneService, AuthenticationService) {     
     $scope.phones = PhoneService.getPhones();
-
     $scope.loggedInUser = AuthenticationService.loggedInUser;
     $scope.addToCart = function($event){
-      var phone = PhoneService.getPhone($event.target.id)
-      PhoneService.addToCart(phone,$scope.loggedInUser);
+      if($scope.loggedInUser){
+        var phone = PhoneService.getPhone($event.target.id)
+        PhoneService.addToCart(phone,$scope.loggedInUser);
+      }
+      else{
+        alert("Please log in to add items to your cart");
+        $location.path("/");
+      }
     }
     $scope.orderProp = 'age';
   });
@@ -178,13 +211,13 @@ eCommerceApp.controller('ProductPageController',
 eCommerceApp.controller('PhoneDetailCtrl', 
  ['$scope', '$location', '$routeParams', 'PhoneService', 
  function($scope, $location, $routeParams, PhoneService) {
-    PhoneService.loadPhone($routeParams.phoneId).success(function(data) {
-      $scope.phone = data;
-      $scope.img = $scope.phone.images[0]
-    })
-    
+  PhoneService.loadPhone($routeParams.phoneId).success(function(data) {
+    $scope.phone = data;
+    $scope.img = $scope.phone.images[0]
+  })
 
-   $scope.setImage = function(img) {
+
+  $scope.setImage = function(img) {
     $scope.img = img
   }
 }]);
@@ -220,7 +253,8 @@ eCommerceApp.controller('ShoppingCartController',
 eCommerceApp.directive('navbarDirective', function() {
   return {
     restrict: 'AE',
-    templateUrl: './partials/navbar.html'
+    templateUrl: './partials/navbar.html',
+    controller: 'AccountController'
   }
 });
 
@@ -287,8 +321,7 @@ function User(data) {
   }
 
   this.checkOut = function(cartItems, cartTotal){
-   var orderIndex = this.myOrders.length;
-   debugger;
+   var orderIndex = this.myOrders.length +1;
    var order = new Order(cartItems, cartTotal, orderIndex, false);
    this.myCartItems = [];
    return this.myOrders.push(order);

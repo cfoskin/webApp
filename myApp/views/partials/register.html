@@ -1,50 +1,39 @@
 <br><br><br>
 <div class="container" id="register">
-    <div class="panel panel-info">
+	<div class="panel panel-info">
 		<div class="panel-heading">
-			<h3 class="panel-title" align="center">
-				<b>Register For Your Account Here!</b>
-			<h3>
-		</div>
-	 <form no validate ng-submit="registerUser()">
-		<div class="form-group">
-		   <div class="panel-body">
-		      <div class="form-group">
-				  <label>
-					Enter First Name 
-				  </label>
-				  <input type="text" class="form-control" ng-model="newUser.name" placeholder="First Name">
-			   </div>
-			   <div class="form-group">
-				  <label>
-				   	Enter Last Name 
-				  </label>
-				  <input type="text" class="form-control" ng-model="newUser.lastName" placeholder="Last Name">
-			    </div>
-			    <div class="form-group">
-				   <label>
-					Enter Address 
-				   </label>
-				   <input type="text" class="form-control" ng-model="newUser.address" placeholder="Address">
-			    </div>
-			    <div class="form-group">
-				   <label>
-					Enter Email 
-				   </label>
-				   <input type="text" class="form-control" ng-model="newUser.email" placeholder="Email Address">
-			    </div>
-			    <div class="form-group">
-			       <label>
-					Enter Password
-				   </label>
-				   <input type="password" class="form-control" ng-model="newUser.password" placeholder="Password">
-				   <br>
-				    <button  type="submit" class="btn pull-right btn-lg btn-success">
-				    	Register Now!
-				   </button>
-			    </div>
+			<h1 class="panel-title" align="center">
+				Register For Your Account Here!
+				<h1>
+				</div>
+				<div class="row">
+					<div class="panel-body col-sm-12 col-md-8 col-md-offset-2">
+						<form no validate ng-submit="registerUser()">
+							<label>
+								Enter First Name 
+							</label>
+							<input type="text" required="required"class="form-control" ng-model="newUser.name" placeholder="eg: Joe">
+							<label>
+								Enter Last Name 
+							</label>
+							<input type="text" required="required" class="form-control" ng-model="newUser.lastName" placeholder="eg: Bloggs">
+							<label>
+								Enter Address 
+							</label>
+							<input type="text" required="required" class="form-control" ng-model="newUser.address" placeholder="eg: 123 Ireland">
+							<label>
+								Enter Email 
+							</label>
+							<input required="required" type="email" class="form-control" ng-model="newUser.email" placeholder="eg: user@user.com">
+							<label>
+								Enter Password
+							</label>
+							<input type="password" required="required" class="form-control" ng-model="newUser.password" placeholder="Password">
+                             <br>
+							<button class="btn btn-lg btn-info btn-block" type="submit">
+								Register Now</button>
+							</form>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-	 </form>
-	</div>
-</div>
