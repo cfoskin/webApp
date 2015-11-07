@@ -31,9 +31,9 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       templateUrl: '/myApp/views/partials/account.html',
       controller:  'AccountController',
     })
-    .when('/checkOut', {
-      templateUrl: '/myApp/views/partials/checkOut.html',
-      controller:  'CheckOutController'
+    .when('/completeOrder', {
+      templateUrl: '/myApp/views/partials/completeOrder.html',
+      controller:  'CompleteOrderController'
     })
     .otherwise({
       redirectTo: '/'
@@ -46,7 +46,6 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
 //A service for storing user User Authentication
 eCommerceApp.service('AuthenticationService', function (StorageService, $location) {
   this.loggedInUser = null;
-  this.isUserLoggedIn = false;
   var users = StorageService.getUsers();
   this.getUsers = function () {
     return users;
@@ -74,16 +73,14 @@ eCommerceApp.service('AuthenticationService', function (StorageService, $locatio
     users.forEach(function(user) {
       if(user.yourCredentials(email, password))
         this.loggedInUser = user;
-      isUserLoggedIn = true;
     }.bind(this));
 
   }
   this.logOut = function() {
    this.loggedInUser = null;
-   isUserLoggedIn = false;
  }
  this.updateUser = function(user, newPassword) {
-    user.password = newPassword;
+  user.password = newPassword;
 }
 
 });
@@ -134,55 +131,70 @@ eCommerceApp.factory('PhoneService', ['$http' , function($http){
 
 
 eCommerceApp.controller('HomePageController', 
-  function ($scope, $location, AuthenticationService,PhoneService) {
+  function ($scope,$rootScope, $location, AuthenticationService) {
     $scope.logIn = {};
-    //REMOVE AT END!!!!!!
-    //AuthenticationService.loggedInUser = AuthenticationService.getUsers()[0];
-    $scope.logIn = function () {
-      if(AuthenticationService.isUserLoggedIn){
-        AuthenticationService.loggedInUser = null;
+    $rootScope.showAccount = !!AuthenticationService.loggedInUser;
+   // AuthenticationService.loggedInUser = AuthenticationService.getUsers()[0];
+   $scope.logIn = function () {
+        AuthenticationService.loggedInUser = null;//log out old
+        AuthenticationService.logIn($scope.logIn.email, $scope.logIn.password );
+        if (AuthenticationService.loggedInUser){
+          $rootScope.showAccount = true;
+          $location.path('/account');
+        }
+        else{
+          $scope.warning = true;//incorrect log in details
+        }
       }
-      AuthenticationService.logIn($scope.logIn.email, $scope.logIn.password );
-      if (AuthenticationService.loggedInUser){
-        $location.path('/account')
-      }
-    }
+    });
+
+eCommerceApp.controller('AccountController', 
+  function ($scope,$location, AuthenticationService, PhoneService) {
+    $scope.loggedInUser = AuthenticationService.loggedInUser;
     $scope.phones = PhoneService.getPhones();
     $scope.orderProp = 'age';
     $scope.quantity = 2;
+
+ $scope.completeOrder=  function(){
+  $location.path("/completeOrder");
+
+ }
+    $scope.updateUser = function () {
+      if($scope.password1 === $scope.password2){
+        AuthenticationService.updateUser($scope.loggedInUser, $scope.password1);
+        alert("Password Changed! - Please log in again");
+        this.logOut();
+      }
+      else{
+        alert("passwords do not match");
+      }
+    }
   });
 
-eCommerceApp.controller('AccountController', 
- function ($scope,$location,$routeParams, AuthenticationService) {
-  $scope.loggedInUser = AuthenticationService.loggedInUser;
-  if( $scope.loggedInUser === null){
-   //alert("Please log in or create and account to view your account page!");
-   $location.path('/')
- }
 
- $scope.logOut = function () {
-  AuthenticationService.logOut();
-  $location.path('/')
-}
+eCommerceApp.controller('NavBarController', 
+ function ($scope,$location, AuthenticationService) {
+  $scope.logOut = function () {
+    AuthenticationService.logOut();
+    $location.path('/')
+  }
 
-$scope.updateUser = function () {
-  if($scope.password1 === $scope.password2){
-      AuthenticationService.updateUser($scope.loggedInUser, $scope.password1);
-      alert("Password Changed! - Please log in again");
-      this.logOut();
+});
+
+eCommerceApp.directive('navbarDirective', function() {
+  return {
+    restrict: 'AE',
+    templateUrl: './partials/navbar.html',
+    controller: 'NavBarController'
   }
-  else{
-    alert("passwords do not match");
-  }
-}
 });
 
 eCommerceApp.controller('RegisterController', function ($scope,AuthenticationService,$location) {
   $scope.users = AuthenticationService.getUsers();
+  $scope.warning = false;
   $scope.registerUser = function () {
     if(AuthenticationService.checkAlreadyReg($scope.newUser)){
-      alert("This email address is already registered - Please try again");
-      $location.path('/register');
+      $scope.warning = true;
     }
     else{
       AuthenticationService.registerUser($scope.newUser);
@@ -195,14 +207,14 @@ eCommerceApp.controller('ProductPageController',
   function ($scope,$location,PhoneService, AuthenticationService) {     
     $scope.phones = PhoneService.getPhones();
     $scope.loggedInUser = AuthenticationService.loggedInUser;
+    $scope.warning = false;
     $scope.addToCart = function($event){
       if($scope.loggedInUser){
         var phone = PhoneService.getPhone($event.target.id)
         PhoneService.addToCart(phone,$scope.loggedInUser);
       }
       else{
-        alert("Please log in to add items to your cart");
-        $location.path("/");
+        $scope.warning = true;
       }
     }
     $scope.orderProp = 'age';
@@ -226,6 +238,7 @@ eCommerceApp.controller('PhoneDetailCtrl',
 eCommerceApp.controller('ShoppingCartController', 
   function ($scope,$location,AuthenticationService,PhoneService) {
     $scope.loggedInUser = AuthenticationService.loggedInUser;
+     $scope.warning = false;
     if( $scope.loggedInUser === null){
       alert("Please log in or create and account to view your shopping cart!");
       $location.path('/')
@@ -235,28 +248,21 @@ eCommerceApp.controller('ShoppingCartController',
       $scope.loggedInUser.removeItemFromCart(phone);
     }
 
-    $scope.checkOut = function(){
+    $scope.createOrder = function(){
       $scope.loggedInUser.myCartItems.length
       if($scope.loggedInUser.myCartItems.length == 0){
-        alert("Please add items to your cart first!");
-        $location.path("/products")
+        $scope.warning = true;
       }
       else{
         var cartTotal = $scope.loggedInUser.calculateCartTotal();
-        if($scope.loggedInUser.checkOut($scope.loggedInUser.myCartItems, cartTotal)){
-          $location.path('/checkOut');
+        if($scope.loggedInUser.createOrder($scope.loggedInUser.myCartItems, cartTotal)){
+          $location.path('/completeOrder');
         }
       }
     }
   });
 
-eCommerceApp.directive('navbarDirective', function() {
-  return {
-    restrict: 'AE',
-    templateUrl: './partials/navbar.html',
-    controller: 'AccountController'
-  }
-});
+
 
 eCommerceApp.directive('footerDirective', function() {
   return {
@@ -265,12 +271,9 @@ eCommerceApp.directive('footerDirective', function() {
   }
 });
 
-eCommerceApp.controller('CheckOutController', 
+eCommerceApp.controller('CompleteOrderController', 
   function ($scope,$location,AuthenticationService,PhoneService) {
     $scope.loggedInUser = AuthenticationService.loggedInUser;
-    if( $scope.loggedInUser === null){
-      $location.path('/')
-    }
     var orders = $scope.loggedInUser.myOrders;
     var incompleteOrder = null;
     orders.forEach(function(order) {
@@ -320,7 +323,7 @@ function User(data) {
     return total;
   }
 
-  this.checkOut = function(cartItems, cartTotal){
+  this.createOrder = function(cartItems, cartTotal){
    var orderIndex = this.myOrders.length +1;
    var order = new Order(cartItems, cartTotal, orderIndex, false);
    this.myCartItems = [];
@@ -348,8 +351,6 @@ function Order(orderedProduct, orderPrice, orderNum, isCompleted) {
   this.orderPrice = orderPrice,
   this.orderNum = orderNum,
   this.orderStatus = 'Incomplete'
-
-
 
 };
 

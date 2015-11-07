@@ -6,6 +6,7 @@
 
 .phones {
   list-style: none;
+  padding: 0;
 }
 
 .thumb {
@@ -15,9 +16,20 @@
   height: 100px;
   width: 100px;
 }
-
+.thumb.account {
+  padding: 0;
+  clear:both;
+  margin: 0;
+  padding-bottom: 0;
+}
+a.thumb.account {
+  height: 60px;
+}
+.thumb.account img {
+  height: 60px;
+}
 .phones li {
-  height: 95px;
+  overflow: auto;
   padding-top: 15px;
 }
 #footer {

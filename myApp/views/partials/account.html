@@ -10,8 +10,7 @@
   <br>
 
   <div class="row">
-    <div class="col-md-4">
-     <br><br>
+    <div class="col-md-3">
      <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">
@@ -20,17 +19,19 @@
       </div>
       <div class="panel-body">
         <table class="table table-bordered">
-          <tr><th>Name</th><th>Last Name</th><th>Address</th><th>Email</th></tr> 
+          <tr><th>Name</th><th>Address</th></tr> 
           <tr>
             <td>
-              {{loggedInUser.name}}
-            </td>
-            <td>
-              {{loggedInUser.lastName}}
+              {{loggedInUser.name}} {{loggedInUser.lastName}}
             </td>
             <td>
               {{loggedInUser.address }}
             </td>
+          </tr>
+        </table>
+        <table class="table table-bordered">
+          <tr><th>Email</th></tr> 
+          <tr>
             <td>
               {{loggedInUser.email }}
             </td>
@@ -41,8 +42,7 @@
   </div>
 
 
-  <div class="col-md-4">
-    <br><br>
+  <div class="col-md-3">
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">
@@ -67,8 +67,7 @@
     </div>
   </div>
 
-  <div class="col-md-4">
-   <br><br>
+  <div class="col-md-3">
    <div class="panel panel-info">
     <div class="panel-heading">
       <h3 class="panel-title">
@@ -80,10 +79,10 @@
    <div class="panel-body" align="center">
     <div class="col-md-12">
       <ul  class="phones">
-        <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail">
+        <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail account">
           <p><b>Order no:{{order.orderNum}}: {{order.orderedProduct.name}}
           Order Total: &euro;{{order.orderPrice}}</b></p>
-          <p><b>Status: <span style="color:red"> {{order.orderStatus}}</span></b>  <button class="btn btn-xs btn-info btn-block" type="submit"> Complete order
+          <p><b>Status: <span style="color:red"> {{order.orderStatus}}</span></b>  <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
           </button></p>
         </li>
       </ul>
@@ -91,4 +90,30 @@
   </div>
 </div>
 </div>
+
+<div class="col-md-3">
+  <div class="panel panel-info">
+    <div class="panel-heading" align="center">
+      <h1 class="panel-title">
+        <b>Our Latest Products</b>
+      </h1>
+      <select ng-model="orderProp">
+        <option value="age">Newest</option>
+      </select>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-10">
+        <ul  class="phones">
+          <li ng-repeat="phone in phones | filter:{name: query } | orderBy:orderProp | limitTo:quantity" class="thumbnail">
+            <a href="/products" class="thumb account"><img ng-src="{{phone.imageUrl}}" ></a>
+            <a href="/products" class="thumb account">{{phone.name}}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 </div>

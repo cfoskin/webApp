@@ -26,8 +26,11 @@
             </button>
           <p> &euro; <span class="label label-info" ng-bind ="{{phone.price}}" ></span></p>
           </li>
-          <button type="submit" ng-click = "checkOut()" class="btn btn-success btn-lg">
-            Check Out
+          <div class="alert alert-danger" ng-model="warning" ng-show="warning" >
+                <strong align="center"><p>You currently have no items to checkout!</p></strong> 
+                </div>
+          <button type="submit" ng-click = "createOrder()" class="btn btn-success btn-lg">
+            Create order
           </button> 
         </ul>
       </div>

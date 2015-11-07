@@ -4,6 +4,9 @@
 		<div class="panel-heading" align="center">
 			<h1 class="panel-title">
 				<b>View All Of Our Products Here</b>
+				<div class="alert alert-danger" ng-model="warning" ng-show="warning" >
+				<strong><h3>Sorry! Please log in to add items to your cart!</h3></strong> 
+				</div>
 			</h1>
 			<br>
 			Search: <input ng-model="query">
@@ -17,8 +20,8 @@
 			<div class="col-md-12">
 				<ul  class="phones">
 					<li ng-repeat="phone in phones | filter:{name: query } | orderBy:orderProp" class="thumbnail">
-				 <a href="/phones/{{phone.id}}" class="thumb"><img ng-src="{{phone.imageUrl}}"></a>
-				<button class="btn btn-success pull-right" type="submit" ng-click = "addToCart($event)" id="{{phone.id}}" btn-xs>Add To Cart
+						<a href="/phones/{{phone.id}}" class="thumb"><img ng-src="{{phone.imageUrl}}"></a>
+						<button class="btn btn-success pull-right" type="submit" ng-click = "addToCart($event)" id="{{phone.id}}" btn-xs>Add To Cart
 						</button>
 						<p> &euro; <span class="badge" ng-bind="phone.price"></span></p>
 						<p>{{phone.name}}</p>
