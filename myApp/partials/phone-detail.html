@@ -1,7 +1,7 @@
 <div class="jumbotron">
      <div class="row">
        <div class="col-sm-6">
-        <img ng-src="/myApp/phones/{{img}}" class="phone">
+        <img ng-src="/phones/{{img}}" class="phone">
        </div>
 
       <div class="col-sm-6">
@@ -9,7 +9,7 @@
          <p>{{phone.description}}</p>
           <ul class="phone-thumbs">
             <li ng-repeat="img in phone.images">
-              <img ng-src="/myApp/phones/{{img}}" ng-click="setImage(img)">
+              <img ng-src="/phones/{{img}}" ng-click="setImage(img)">
             </li>
           </ul>
        </div>

@@ -4,13 +4,12 @@
          <div class="alert alert-danger" ng-model="warning" ng-show="warning" >
                 <strong align="center"><p>Incorrect Details! Please try again</p></strong> 
                 </div>
-            <h3 class="text-center login-title">Please sign in to shop!</h3>
+            <h3 class="text-center signIn-title">Please sign in to shop!</h3>
                 <form class="form-signin">
-                <input type="text" class="form-control" placeholder="Email" ng-model="logIn.email" required autofocus>
-                <input type="password" class="form-control" placeholder="Password" ng-model="logIn.password" required>
+                <input type="text" class="form-control" placeholder="Email" ng-model="signIn.email" required autofocus>
+                <input type="password" class="form-control" placeholder="Password" ng-model="signIn.password" required>
                  <br>
-                <button class="btn btn-lg btn-info btn-block" type="submit" ng-click= "logIn()">
-                    Sign in</button>
+                <button class="btn btn-lg btn-info btn-block" type="submit" ng-click= "signIn()">Sign in</button>
                 </form>
             <a href="/register" class="text-center new-account">Register here </a>
         </div>

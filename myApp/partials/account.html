@@ -79,12 +79,14 @@
     <div class="col-md-12">
       <ul  class="orders">
         <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail account">
-         <p>Order no:{{order.orderNum}}</p>
+        <font size="1">Order no:{{order.orderNum}}
          <ul  class="orders">
            <li ng-repeat="phone in order.orderedProducts" class="thumbnail account">
             {{phone.id}}</li>
-            Order Total: &euro;{{order.orderPrice}}</b></p>
+            Order Total: &euro;{{order.orderTotal}}</b>
             <p>Status: <span style="color:red"> {{order.orderStatus}}</span>
+            </p>
+            </font>
               <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
               </button></p>
             </ul>
