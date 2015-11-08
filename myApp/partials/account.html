@@ -1,4 +1,4 @@
-<br>
+<br> 
 <div class="container" align="center">
   <div class="page-header">
     <h3 align="center">
@@ -77,12 +77,17 @@
    </div>
    <div class="panel-body" align="center">
     <div class="col-md-12">
-      <ul  class="phones">
+      <ul  class="orders">
         <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail account">
-          <p><b>Order no:{{order.orderNum}}: {{order.orderedProduct.name}}
+         <p>Order no:{{order.orderNum}}</p>
+         <ul  class="orders">
+           <li ng-repeat="phone in order.orderedProducts" class="thumbnail account">
+            {{phone.id}}</li>
             Order Total: &euro;{{order.orderPrice}}</b></p>
-            <p><b>Status: <span style="color:red"> {{order.orderStatus}}</span></b>  <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
-            </button></p>
+            <p>Status: <span style="color:red"> {{order.orderStatus}}</span>
+              <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
+              </button></p>
+            </ul>
           </li>
         </ul>
       </div>

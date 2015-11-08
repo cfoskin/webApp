@@ -192,6 +192,16 @@ eCommerceApp.directive('navbarDirective', function() {
   }
 });
 
+
+
+eCommerceApp.directive('footerDirective', function() {
+  return {
+    restrict: 'AE',
+    templateUrl: './partials/footer.html',
+    controller: 'SignOutController'
+  }
+});
+
 eCommerceApp.controller('RegisterController', function ($scope,AuthenticationService,$location) {
   $scope.users = AuthenticationService.getUsers();
   $scope.warning = false;
@@ -252,26 +262,15 @@ eCommerceApp.controller('ShoppingCartController',
     }
 
     $scope.createOrder = function(){
-      $scope.loggedInUser.myCartItems.length
-      if($scope.loggedInUser.myCartItems.length == 0){
-        $scope.warning = true;
-      }
-      else{
-        var cartTotal = $scope.loggedInUser.calculateCartTotal();
-        if($scope.loggedInUser.createOrder($scope.loggedInUser.myCartItems, cartTotal)){
-          $location.path('/completeOrder');
-        }
+     // $scope.loggedInUser.myCartItems.length
+     if(!$scope.loggedInUser.shoppingCart.hasItems()){
+      $scope.warning = true;
+    }
+    else{
+      if($scope.loggedInUser.createOrder()){
+        $location.path('/completeOrder');
       }
     }
-  });
-
-
-
-eCommerceApp.directive('footerDirective', function() {
-  return {
-    restrict: 'AE',
-    templateUrl: './partials/footer.html',
-    controller: 'SignOutController'
   }
 });
 
@@ -296,14 +295,13 @@ eCommerceApp.controller('CompleteOrderController',
   });
 
 
-
 function User(data) {
   this.name = data.name || '',
   this.lastName = data.lastName || '',
   this.email = data.email || '',
   this.address = data.address || '',
   this.password = data.password || '',
-  this.myCartItems = data.myCartItems || [],
+  this.shoppingCart = new ShoppingCart(),
   this.myOrders = data.myOrders || [],
 
   this.yourCredentials = function(email, password) {
@@ -311,30 +309,23 @@ function User(data) {
   }
 
   this.addItemToCart = function(phone){
-    return this.myCartItems.push(phone);
+    return this.shoppingCart.add(phone);
   }
 
   this.removeItemFromCart = function(phone){
-    var index = this.myCartItems.indexOf(phone);
-    return this.myCartItems.splice(index, 1);
+   
+    return this.shoppingCart.remove(phone);
   }
 
-  this.calculateCartTotal = function(){
-    var total =0;
-    this.myCartItems.forEach(function(phone) {
-      total += phone.price;
-    })
-    return total;
+  this.createOrder = function(){
+    var cartTotal = this.shoppingCart.calculateTotal();
+    var orderIndex = this.myOrders.length +1;
+    var order = new Order(this.shoppingCart.getItems(), cartTotal, orderIndex, false);
+    this.shoppingCart.emptyCart();
+    return this.myOrders.push(order);
   }
 
-  this.createOrder = function(cartItems, cartTotal){
-   var orderIndex = this.myOrders.length +1;
-   var order = new Order(cartItems, cartTotal, orderIndex, false);
-   this.myCartItems = [];
-   return this.myOrders.push(order);
- }
-
- this.completeOrder = function(incompleteOrder){
+  this.completeOrder = function(incompleteOrder){
    incompleteOrder.orderStatus = 'Completed & Shipped';
    return incompleteOrder.isCompleted = true;
  }
@@ -349,8 +340,8 @@ function Phone(data) {
   this.snippet = data.snippet || ''
 }
 
-function Order(orderedProduct, orderPrice, orderNum, isCompleted) {
-  this.orderedProduct = orderedProduct,
+function Order(orderedProducts, orderPrice, orderNum, isCompleted) {
+  this.orderedProducts = orderedProducts,
   this.isCompleted = isCompleted,
   this.orderPrice = orderPrice,
   this.orderNum = orderNum,
@@ -358,3 +349,38 @@ function Order(orderedProduct, orderPrice, orderNum, isCompleted) {
 
 };
 
+
+
+function ShoppingCart(){
+  this.items = [],
+
+  this.calculateTotal = function(){
+    var total =0;
+    this.items.forEach(function(phone) {
+      total += phone.price;
+    })
+    return total;
+  }
+
+  this.add = function(phone){
+    this.items.push(phone);
+  }
+
+  this.remove = function(phone){
+    var index = this.items.indexOf(phone);
+    return this.items.splice(index, 1);
+  }
+
+  this.emptyCart = function(){
+    this.items = [];
+  }
+
+  this.getItems =function(){
+    return this.items;
+  }
+
+  this.hasItems = function() {
+    return this.items.length > 0;
+  }
+
+}
