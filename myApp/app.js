@@ -4,35 +4,35 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider
     .when('/', {
-      templateUrl: '/myApp/views/partials/homePage.html',
+      templateUrl: '/myApp/partials/homePage.html',
       controller:  'HomePageController' 
     })
     .when('/products', {
-      templateUrl: '/myApp/views/partials/products.html',
+      templateUrl: '/myApp/partials/products.html',
       controller: 'ProductPageController'
     })
     .when('/landingPage', {
-      templateUrl: '/myApp/views/partials/landingPage.html',
+      templateUrl: '/myApp/partials/landingPage.html',
     })
     .when('/phones/:phoneId', {
-      templateUrl: '/myApp/views/partials/phone-detail.html',
+      templateUrl: '/myApp/partials/phone-detail.html',
       controller: 'PhoneDetailCtrl'
     })
     .when('/register', {
-      templateUrl: '/myApp/views/partials/register.html',
+      templateUrl: '/myApp/partials/register.html',
       controller:  'RegisterController'
 
     })
     .when('/shoppingCart', {
-      templateUrl: '/myApp/views/partials/shoppingCart.html',
+      templateUrl: '/myApp/partials/shoppingCart.html',
       controller: 'ShoppingCartController'
     })
     .when('/account', {
-      templateUrl: '/myApp/views/partials/account.html',
+      templateUrl: '/myApp/partials/account.html',
       controller:  'AccountController',
     })
     .when('/completeOrder', {
-      templateUrl: '/myApp/views/partials/completeOrder.html',
+      templateUrl: '/myApp/partials/completeOrder.html',
       controller:  'CompleteOrderController'
     })
     .otherwise({
@@ -50,22 +50,22 @@ eCommerceApp.service('AuthenticationService', function (StorageService, $locatio
   this.getUsers = function () {
     return users;
   }
+//check if a user has already registered with the entered email.
+this.checkAlreadyReg = function(userData){
+  var result = false;
+  users.some(function(user){
+    if(user.email === userData.email){
+      result = true;
+    }
+    else{
+      result = false;
+    }
+  })
+  return result;
+}
 
-  this.checkAlreadyReg = function(userData){
-    var result = false;
-    users.some(function(user){
-      if(user.email === userData.email){
-        result = true;
-      }
-      else{
-        result = false;
-      }
-    })
-    return result;
-  }
-
-  this.registerUser = function(userData) {
-   users.push(new User(userData));
+this.registerUser = function(userData) {
+ users.push(new User(userData));
     // StorageService.saveUsers(users);
   }
 
@@ -76,7 +76,7 @@ eCommerceApp.service('AuthenticationService', function (StorageService, $locatio
     }.bind(this));
 
   }
-  this.logOut = function() {
+  this.signOut = function() {
    this.loggedInUser = null;
  }
  this.updateUser = function(user, newPassword) {
@@ -133,7 +133,8 @@ eCommerceApp.factory('PhoneService', ['$http' , function($http){
 eCommerceApp.controller('HomePageController', 
   function ($scope,$rootScope, $location, AuthenticationService) {
     $scope.logIn = {};
-    $rootScope.showAccount = !!AuthenticationService.loggedInUser;
+    AuthenticationService.loggedInUser = false;
+    $rootScope.showAccount =  AuthenticationService.loggedInUser;
    // AuthenticationService.loggedInUser = AuthenticationService.getUsers()[0];
    $scope.logIn = function () {
         AuthenticationService.loggedInUser = null;//log out old
@@ -154,28 +155,30 @@ eCommerceApp.controller('AccountController',
     $scope.phones = PhoneService.getPhones();
     $scope.orderProp = 'age';
     $scope.quantity = 2;
+    $scope.warning = false;
 
- $scope.completeOrder=  function(){
-  $location.path("/completeOrder");
+    $scope.completeOrder=  function(){
+      $location.path("/completeOrder");
 
- }
+    }
     $scope.updateUser = function () {
       if($scope.password1 === $scope.password2){
         AuthenticationService.updateUser($scope.loggedInUser, $scope.password1);
         alert("Password Changed! - Please log in again");
-        this.logOut();
+        this.signOut();
       }
       else{
-        alert("passwords do not match");
+        $scope.warning = true;
       }
     }
   });
 
 
-eCommerceApp.controller('NavBarController', 
+eCommerceApp.controller('SignOutController', 
  function ($scope,$location, AuthenticationService) {
-  $scope.logOut = function () {
-    AuthenticationService.logOut();
+  $scope.signOut = function () {
+    AuthenticationService.signOut();
+    alert("You are now signed out")
     $location.path('/')
   }
 
@@ -185,7 +188,7 @@ eCommerceApp.directive('navbarDirective', function() {
   return {
     restrict: 'AE',
     templateUrl: './partials/navbar.html',
-    controller: 'NavBarController'
+    controller: 'SignOutController'
   }
 });
 
@@ -238,7 +241,7 @@ eCommerceApp.controller('PhoneDetailCtrl',
 eCommerceApp.controller('ShoppingCartController', 
   function ($scope,$location,AuthenticationService,PhoneService) {
     $scope.loggedInUser = AuthenticationService.loggedInUser;
-     $scope.warning = false;
+    $scope.warning = false;
     if( $scope.loggedInUser === null){
       alert("Please log in or create and account to view your shopping cart!");
       $location.path('/')
@@ -267,7 +270,8 @@ eCommerceApp.controller('ShoppingCartController',
 eCommerceApp.directive('footerDirective', function() {
   return {
     restrict: 'AE',
-    templateUrl: './partials/footer.html'
+    templateUrl: './partials/footer.html',
+    controller: 'SignOutController'
   }
 });
 
