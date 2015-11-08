@@ -69,17 +69,17 @@ this.checkAlreadyReg = function(userData){
 this.registerUser = function(userData) {
  users.push(new User(userData));
  StorageService.saveUsers(users);
-  }
-  this.signIn = function(email, password) {
-    users.forEach(function(user) {
-      if(user.yourCredentials(email, password))
-        this.loggedInUser = user;
-    }.bind(this));
-  }
-  this.signOut = function() {
-   this.loggedInUser = null;
- }
- this.updateUser = function(user, newPassword) {
+}
+this.signIn = function(email, password) {
+  users.forEach(function(user) {
+    if(user.yourCredentials(email, password))
+      this.loggedInUser = user;
+  }.bind(this));
+}
+this.signOut = function() {
+ this.loggedInUser = null;
+}
+this.updateUser = function(user, newPassword) {
   user.password = newPassword;
 }
 });
@@ -130,13 +130,13 @@ eCommerceApp.controller('HomePageController',
     $scope.signIn = {};
     AuthenticationService.loggedInUser = false;//using this as a flag for ng-show
     $rootScope.showAccount =  AuthenticationService.loggedInUser;
-   $scope.signIn = function () {
-        AuthenticationService.signIn($scope.signIn.email, $scope.signIn.password );
-        if (AuthenticationService.loggedInUser){
-          $rootScope.showAccount = true;
-          $location.path('/account');
-        }
-        else{
+    $scope.signIn = function () {
+      AuthenticationService.signIn($scope.signIn.email, $scope.signIn.password );
+      if (AuthenticationService.loggedInUser){
+        $rootScope.showAccount = true;
+        $location.path('/account');
+      }
+      else{
           $scope.warning = true;//incorrect log in details
         }
       }
@@ -169,12 +169,14 @@ eCommerceApp.controller('AccountController',
 
 //controller which is used by the navbar and footer which both have sign out feature
 eCommerceApp.controller('SignOutController', 
- function ($scope,$location, AuthenticationService) {
+ function ($scope,$location, AuthenticationService,StorageService) {
   $scope.signOut = function () {
-    AuthenticationService.signOut();
-    alert("You are now signed out")
-    $location.path('/')
-  }
+   var users = AuthenticationService.getUsers();
+   AuthenticationService.signOut();
+   StorageService.saveUsers(users);
+   alert("You are now signed out")
+   $location.path('/')
+ }
 });
 
 //directive for navbar
@@ -351,7 +353,7 @@ function ShoppingCart(){
   this.add = function(phone){
     var index = this.items.indexOf(phone);
     if(index < 0){
-          this.items.push(phone);
+      this.items.push(phone);
     }
   }
   this.remove = function(phone){
