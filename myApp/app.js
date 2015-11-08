@@ -6,35 +6,35 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
   function($routeProvider, $locationProvider) {
     $routeProvider
     .when('/', {
-      templateUrl: '/partials/homePage.html',
+      templateUrl: '/myApp/partials/homePage.html',
       controller:  'HomePageController' 
     })
     .when('/products', {
-      templateUrl: '/partials/products.html',
+      templateUrl: '/myApp/partials/products.html',
       controller: 'ProductPageController'
     })
     .when('/landingPage', {
-      templateUrl: '/partials/landingPage.html',
+      templateUrl: '/myApp/partials/landingPage.html',
     })
     .when('/phones/:phoneId', {
-      templateUrl: '/partials/phone-detail.html',
+      templateUrl: '/myApp/partials/phone-detail.html',
       controller: 'PhoneDetailCtrl'
     })
     .when('/register', {
-      templateUrl: '/partials/register.html',
+      templateUrl: '/myApp/partials/register.html',
       controller:  'RegisterController'
 
     })
     .when('/shoppingCart', {
-      templateUrl: '/partials/shoppingCart.html',
+      templateUrl: '/myApp/partials/shoppingCart.html',
       controller: 'ShoppingCartController'
     })
     .when('/account', {
-      templateUrl: '/partials/account.html',
+      templateUrl: '/myApp/partials/account.html',
       controller:  'AccountController',
     })
     .when('/completeOrder', {
-      templateUrl: '/partials/completeOrder.html',
+      templateUrl: '/myApp/partials/completeOrder.html',
       controller:  'CompleteOrderController'
     })
     .otherwise({
@@ -100,7 +100,7 @@ eCommerceApp.service('StorageService', function () {
 //A service for the phones
 eCommerceApp.factory('PhoneService', ['$http' , function($http){
   var phones =[];
-  $http.get('/phones/phones.json').success(function(phoneData) {
+  $http.get('/myApp/phones/phones.json').success(function(phoneData) {
     phoneData.forEach(function(data) {
       phones.push(new Phone(data));
     });
@@ -118,7 +118,7 @@ eCommerceApp.factory('PhoneService', ['$http' , function($http){
       }).pop();
     },
     loadPhone : function(id){
-      return $http.get('/phones/' + id + '.json');
+      return $http.get('/myApp/phones/' + id + '.json');
     }
   }
   return api;
@@ -181,7 +181,7 @@ eCommerceApp.controller('SignOutController',
 eCommerceApp.directive('navbarDirective', function() {
   return {
     restrict: 'AE',
-    templateUrl: './partials/navbar.html',
+    templateUrl: '/myApp/partials/navbar.html',
     controller: 'SignOutController'
   }
 });
@@ -190,7 +190,7 @@ eCommerceApp.directive('navbarDirective', function() {
 eCommerceApp.directive('footerDirective', function() {
   return {
     restrict: 'AE',
-    templateUrl: './partials/footer.html',
+    templateUrl: '/myApp/partials/footer.html',
     controller: 'SignOutController'
   }
 });
@@ -277,6 +277,7 @@ eCommerceApp.controller('CompleteOrderController',
       incompleteOrder = order;
     }
   });
+    $scope.orderTotal = incompleteOrder.orderTotal;
     $scope.completeOrder = function(){
       if($scope.loggedInUser.completeOrder(incompleteOrder)){
         alert("Order Completed");
