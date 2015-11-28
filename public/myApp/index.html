@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="eCommerceApp">
+<head>
+	<title>
+		Colum Foskin's E-Commerce Application
+	</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="/styles/custom.css" rel="stylesheet">
+	<link href="/styles/bootstrap.min.css" rel="stylesheet">
+	<link href="/fonts/bootstrap-glyphicons.css" rel="stylesheet">
+	<script src="/support/jquery.min.js"></script>
+	<script src="/support/bootstrap.min.js"></script>	<style>
+	.carousel-inner > .item > img,
+	.carousel-inner > .item > a > img {
+		width: 70%;
+		margin: auto;
+	}
+</style>
+</head>
+<div class="container">
+	<body>
+		<navbar-directive></navbar-directive>
+		<div class="row">
+			<div ng-view ></div>
+		</div>
+		<footer-directive></footer-directive>
+		<script src="/support/angular.js"></script> 
+		<script src="/support/angular-route.js"></script>
+		<script src="/myApp/app.js"></script>
+	</body>
+</div>
+
+</html>
