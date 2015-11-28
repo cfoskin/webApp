@@ -22,3 +22,13 @@ function handleError(res, err) {
       		return res.json(201, user);
       	});
       };
+
+      // Deletes a customer from datastore.
+    exports.destroy = function(req, res) {
+        User.findById(req.params.id, function (err, user) {
+            user.remove(function (err) {
+                if(err) { return handleError(res, err); }
+                return res.send(200,'Deleted');
+            });
+        })
+    }

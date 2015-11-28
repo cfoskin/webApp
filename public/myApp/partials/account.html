@@ -9,6 +9,10 @@
   </div>
   <br>
   <div class="row">
+    <button  type="submit" class="btn btn-lg btn-danger btn-block" ng-click = "closeAccount()">
+      Close your Account! 
+    </button>
+    <br><br>
     <div class="alert alert-danger" ng-model="warning" ng-show="warning" >
       <strong ><p align="center">The Passwords entered do not match</strong> </p>
     </div>
@@ -79,22 +83,22 @@
     <div class="col-md-12">
       <ul  class="orders">
         <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail account">
-        <font size="1">Order no:{{order.orderNum}}
-         <ul  class="orders">
-           <li ng-repeat="phone in order.orderedProducts" class="thumbnail account">
-            {{phone.id}}</li>
-            Order Total: &euro;{{order.orderTotal}}</b>
-            <p>Status: <span style="color:red"> {{order.orderStatus}}</span>
-            </p>
+          <font size="1">Order no:{{order.orderNum}}
+           <ul  class="orders">
+             <li ng-repeat="phone in order.orderedProducts" class="thumbnail account">
+              {{phone.id}}</li>
+              Order Total: &euro;{{order.orderTotal}}</b>
+              <p>Status: <span style="color:red"> {{order.orderStatus}}</span>
+              </p>
             </font>
-              <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
-              </button></p>
-            </ul>
-          </li>
-        </ul>
-      </div>
+            <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
+            </button></p>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
+</div>
 </div>
 <div class="col-md-3">
   <div class="panel panel-info">
@@ -118,4 +122,5 @@
     </div>
   </div>
 </div>
+
 </div>

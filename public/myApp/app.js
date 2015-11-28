@@ -46,16 +46,25 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
   }]);
 
 //A service for storing user User Authentication
-eCommerceApp.service('AuthenticationService', function (StorageService, $location) {
+eCommerceApp.service('UserService', function (StorageService, $location) {
   this.loggedInUser = null;
   var users = [];
-  var promise = StorageService.getUsers();
+//   var promise = StorageService.getUsers();
+//   promise.success(function(usersData) {
+//   users = usersData.map(function(userData) {//create User objects from the users stored in json
+//     return new User(userData);
+//   });
+// });
+
+this.refreshUsers = function(){
+ var promise = StorageService.getUsers();
   promise.success(function(usersData) {
   users = usersData.map(function(userData) {//create User objects from the users stored in json
     return new User(userData);
   });
 });
 
+};
   this.getUsers = function () {
     return users;
   };
@@ -73,8 +82,16 @@ this.checkAlreadyReg = function(userData){
   return result;
 };
 this.registerUser = function(userData) {
- users.push(new User(userData));
- StorageService.saveUsers(users);
+  users.push(new User(userData));
+  StorageService.saveUsers(users).success(function(){
+    refreshUsers();
+//     var promise = StorageService.getUsers();
+//     promise.success(function(usersData) {
+//    users = usersData.map(function(userData) {//create User objects from the users stored in json
+//     return new User(userData);
+//   });
+// });
+  });
 };
 this.signIn = function(email, password) {
   users.forEach(function(user) {
@@ -88,18 +105,32 @@ this.signOut = function() {
 this.updateUser = function(user, newPassword) {
   user.password = newPassword;
 };
+this.closeAccount = function(user){
+  StorageService.deleteUser(user, users); 
+  this.refreshUsers();
+};//end of function
 });
 
-eCommerceApp.service('StorageService', ['$http' , function($http){
+//Storage service
+eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   this.getUsers = function() {
     return $http.get('/api/users/getUsers');
   };
 
+  this.deleteUser = function(user, users){
+    var index = users.indexOf(user);
+    $http.delete('/api/users/' + user.id).success(function() {
+      users.splice(index, 1);
+    });
+  }
   this.saveUsers = function(users) {
-    $http.post('/api/users/addUser', users.pop());
+    return $http.post('/api/users/addUser', users.pop());
+  };
+
+  this.putOrder = function(order){
+    $http.post('/api/orders/addOrder', order);
   };
 }]);
-
 
 
 //A service for the phones
@@ -111,8 +142,8 @@ eCommerceApp.factory('PhoneService', ['$http' , function($http){
     });
   });
   var api = {
-    PutPhones: function(){//used to put the phones into the db
-    $http.post('/api/phones/addPhones', phones);
+    PutPhones: function(){//used to put the phones into the db first time around.
+      $http.post('/api/phones/addPhones', phones);
     },
     getPhones : function() {
       return phones;
@@ -134,13 +165,14 @@ eCommerceApp.factory('PhoneService', ['$http' , function($http){
 
 //the controller for the homepage which has only logging in.
 eCommerceApp.controller('HomePageController', 
-  function ($scope,$rootScope, $location, AuthenticationService,PhoneService) {
+  function ($scope,$rootScope, $location, UserService,PhoneService) {
    $scope.signIn = {};
-    AuthenticationService.loggedInUser = false;//using this as a flag for ng-show
-    $rootScope.showAccount =  AuthenticationService.loggedInUser;
+   UserService.refreshUsers();
+    UserService.loggedInUser = false;//using this as a flag for ng-show
+    $rootScope.showAccount =  UserService.loggedInUser;
     $scope.signIn = function () {
-      AuthenticationService.signIn($scope.signIn.email, $scope.signIn.password );
-      if (AuthenticationService.loggedInUser){
+      UserService.signIn($scope.signIn.email, $scope.signIn.password );
+      if (UserService.loggedInUser){
         $rootScope.showAccount = true;
         $location.path('/account');
       }
@@ -153,19 +185,23 @@ eCommerceApp.controller('HomePageController',
 //The account controller which allows the user to finish incomplete orders, and update 
 //their password
 eCommerceApp.controller('AccountController', 
-  function ($scope,$location, AuthenticationService, PhoneService) {
-    $scope.loggedInUser = AuthenticationService.loggedInUser;
+  function ($scope,$location, UserService, PhoneService) {
+    $scope.loggedInUser = UserService.loggedInUser;
     $scope.phones = PhoneService.getPhones();
     $scope.orderProp = 'age';
     $scope.quantity = 2;
     $scope.warning = false;//ng-show flag
 
+    $scope.closeAccount = function(){
+      UserService.closeAccount($scope.loggedInUser);
+      $location.path('/');
+    }
     $scope.completeOrder=  function(){
       $location.path("/completeOrder");
     }
     $scope.updateUser = function () {
       if($scope.password1 === $scope.password2){
-        AuthenticationService.updateUser($scope.loggedInUser, $scope.password1);
+        UserService.updateUser($scope.loggedInUser, $scope.password1);
         alert("Password Changed! - Please log in again");
         this.signOut();
       }
@@ -177,11 +213,11 @@ eCommerceApp.controller('AccountController',
 
 //controller which is used by the navbar and footer which both have sign out feature
 eCommerceApp.controller('SignOutController', 
- function ($scope,$location, AuthenticationService,StorageService) {
+ function ($scope,$location, UserService,StorageService) {
   $scope.signOut = function () {
-   var users = AuthenticationService.getUsers();
-   AuthenticationService.signOut();
-   StorageService.saveUsers(users);
+   //var users = UserService.getUsers();
+   UserService.signOut();
+   //StorageService.saveUsers(users);
    alert("You are now signed out")
    $location.path('/')
  }
@@ -206,15 +242,15 @@ eCommerceApp.directive('footerDirective', function() {
 });
 
 //registration controller
-eCommerceApp.controller('RegisterController', function ($scope,AuthenticationService,$location) {
-  $scope.users = AuthenticationService.getUsers();
+eCommerceApp.controller('RegisterController', function ($scope,UserService,$location) {
+  $scope.users = UserService.getUsers();
   $scope.warning = false;//ng-show flag
   $scope.registerUser = function () {
-    if(AuthenticationService.checkAlreadyReg($scope.newUser)){
+    if(UserService.checkAlreadyReg($scope.newUser)){
       $scope.warning = true;
     }
     else{
-      AuthenticationService.registerUser($scope.newUser);
+      UserService.registerUser($scope.newUser);
       alert("Success! Please Sign In");
       $location.path('/');
     }
@@ -222,10 +258,10 @@ eCommerceApp.controller('RegisterController', function ($scope,AuthenticationSer
 });
 
 //product page controller which allows a use to add an item to their cart
-eCommerceApp.controller('ProductPageController', function ($scope,$location,PhoneService, AuthenticationService) { 
-    $scope.phones = PhoneService.getPhones();
+eCommerceApp.controller('ProductPageController', function ($scope,$location,PhoneService, UserService) { 
+  $scope.phones = PhoneService.getPhones();
     //PhoneService.PutPhones();//used to put the phones in the db first time around
-    $scope.loggedInUser = AuthenticationService.loggedInUser;
+    $scope.loggedInUser = UserService.loggedInUser;
     $scope.warning = false;//ng-show flag
     $scope.addToCart = function($event){
       if($scope.loggedInUser){
@@ -250,12 +286,12 @@ eCommerceApp.controller('PhoneDetailCtrl',
   $scope.setImage = function(img) {
     $scope.img = img;
   }
-}])
-;
+}]);
+
 //shopping cart controller for removing items or creating an order from the cart
 eCommerceApp.controller('ShoppingCartController', 
-  function ($scope,$location,AuthenticationService,PhoneService) {
-    $scope.loggedInUser = AuthenticationService.loggedInUser;
+  function ($scope,$location,UserService,PhoneService,StorageService) {
+    $scope.loggedInUser = UserService.loggedInUser;
     $scope.warning = false;//ng-show flag
     if( $scope.loggedInUser === null){
       alert("Please log in or create and account to view your shopping cart!");
@@ -270,7 +306,8 @@ eCommerceApp.controller('ShoppingCartController',
       $scope.warning = true;
     }
     else{
-      $scope.loggedInUser.createOrder();
+      var order = $scope.loggedInUser.createOrder();
+      StorageService.putOrder(order);
       $location.path('/completeOrder');
     }
   }
@@ -278,8 +315,8 @@ eCommerceApp.controller('ShoppingCartController',
 
 //controller to allow the use finish off the order process
 eCommerceApp.controller('CompleteOrderController', 
-  function ($scope,$location,AuthenticationService,PhoneService) {
-    $scope.loggedInUser = AuthenticationService.loggedInUser;
+  function ($scope,$location,UserService,PhoneService) {
+    $scope.loggedInUser = UserService.loggedInUser;
     var orders = $scope.loggedInUser.orders;
     var incompleteOrder = null;
     orders.forEach(function(order) {
@@ -298,6 +335,7 @@ eCommerceApp.controller('CompleteOrderController',
 
 //the User model
 function User(data) {
+  this.id = data._id,
   this.name = data.name || '',
   this.lastName = data.lastName || '',
   this.email = data.email || '',
@@ -318,9 +356,10 @@ function User(data) {
   this.createOrder = function(){
     var cartTotal = this.shoppingCart.calculateTotal();
     var orderIndex = this.orders.length +1;
-    var order = new Order(this.shoppingCart.getItems(), cartTotal, orderIndex, false);
+    var order = new Order(this.id, this.shoppingCart.getItems(), cartTotal, orderIndex, false);
     this.shoppingCart.emptyCart();
     this.orders.push(order);
+    return order;
   }
   this.completeOrder = function(incompleteOrder){
    incompleteOrder.orderStatus = 'Completed & Shipped';
@@ -339,7 +378,8 @@ function Phone(data) {
 }
 
 //the Order model
-function Order(orderedProducts, orderTotal, orderNum, isCompleted) {
+function Order(userId,orderedProducts, orderTotal, orderNum, isCompleted) {
+  this.userId = userId,
   this.orderedProducts = orderedProducts,
   this.isCompleted = isCompleted,
   this.orderTotal = orderTotal,
