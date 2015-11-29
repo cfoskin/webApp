@@ -49,25 +49,35 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
 eCommerceApp.service('UserService', function (StorageService, $location) {
   this.loggedInUser = null;
   var users = [];
-//   var promise = StorageService.getUsers();
-//   promise.success(function(usersData) {
-//   users = usersData.map(function(userData) {//create User objects from the users stored in json
-//     return new User(userData);
-//   });
-// });
+  var orders = [];
 
-this.refreshUsers = function(){
- var promise = StorageService.getUsers();
-  promise.success(function(usersData) {
+  this.refreshUsers = function(){
+   var promise = StorageService.getUsers();
+   promise.success(function(usersData) {
   users = usersData.map(function(userData) {//create User objects from the users stored in json
     return new User(userData);
   });
 });
+ };
 
+ // this.getOrders = function(user){
+ //   var promise = StorageService.getOrders();
+ //   promise.success(function(ordersData){
+ //    orders = ordersData.map(function(orderData){
+ //      if(orderData.userId === user.id){
+ //        return new Order(orderData);
+ //      };
+ //    });
+ //  });
+ // };
+
+ this.putUser = function(user) {
+  StorageService.putUser(user);
 };
-  this.getUsers = function () {
-    return users;
-  };
+
+this.getUsers = function () {
+  return users;
+};
 //check if a user has already registered with the entered email.
 this.checkAlreadyReg = function(userData){
   var result = false;
@@ -83,15 +93,9 @@ this.checkAlreadyReg = function(userData){
 };
 this.registerUser = function(userData) {
   users.push(new User(userData));
-  StorageService.saveUsers(users).success(function(){
-    refreshUsers();
-//     var promise = StorageService.getUsers();
-//     promise.success(function(usersData) {
-//    users = usersData.map(function(userData) {//create User objects from the users stored in json
-//     return new User(userData);
-//   });
-// });
-  });
+  StorageService.postUser(users).success(function(){
+    this.refreshUsers();
+  }.bind(this));
 };
 this.signIn = function(email, password) {
   users.forEach(function(user) {
@@ -107,7 +111,6 @@ this.updateUser = function(user, newPassword) {
 };
 this.closeAccount = function(user){
   StorageService.deleteUser(user, users); 
-  this.refreshUsers();
 };//end of function
 });
 
@@ -116,20 +119,27 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   this.getUsers = function() {
     return $http.get('/api/users/getUsers');
   };
-
   this.deleteUser = function(user, users){
     var index = users.indexOf(user);
     $http.delete('/api/users/' + user.id).success(function() {
       users.splice(index, 1);
     });
-  }
-  this.saveUsers = function(users) {
+  };
+  this.putUser = function(user) {
+    $http.put('/api/users/' + user.id, { "name": user.name, "lastName": user.lastName, "email": user.email, "address": user.address, "password": user.password, "orders": user.orders })
+    .success(function() {
+      users[user.id] = user;
+    });
+  };
+  this.postUser = function(users) {
     return $http.post('/api/users/addUser', users.pop());
   };
-
-  this.putOrder = function(order){
+  this.postOrder = function(order){
     $http.post('/api/orders/addOrder', order);
   };
+  // this.getOrders = function(){
+  //   return $http.get('/api/orders/getOrders');
+  // };
 }]);
 
 
@@ -188,6 +198,7 @@ eCommerceApp.controller('AccountController',
   function ($scope,$location, UserService, PhoneService) {
     $scope.loggedInUser = UserService.loggedInUser;
     $scope.phones = PhoneService.getPhones();
+    $scope.orders = $scope.loggedInUser.orders; //UserService.getOrders($scope.loggedInUser);
     $scope.orderProp = 'age';
     $scope.quantity = 2;
     $scope.warning = false;//ng-show flag
@@ -217,7 +228,7 @@ eCommerceApp.controller('SignOutController',
   $scope.signOut = function () {
    //var users = UserService.getUsers();
    UserService.signOut();
-   //StorageService.saveUsers(users);
+   //StorageService.postUser(users);
    alert("You are now signed out")
    $location.path('/')
  }
@@ -307,7 +318,9 @@ eCommerceApp.controller('ShoppingCartController',
     }
     else{
       var order = $scope.loggedInUser.createOrder();
-      StorageService.putOrder(order);
+      StorageService.postOrder(order);
+      debugger;
+      UserService.putUser($scope.loggedInUser);
       $location.path('/completeOrder');
     }
   }

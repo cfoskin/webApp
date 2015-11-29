@@ -2,6 +2,7 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 
 var OrderSchema = new Schema({
+	userId: { type: String, required: true},
 	orderedProducts: { type: Array, required: true },
 	isCompleted: { type: Boolean, required: true },
 	orderTotal: { type: Number, required: true },

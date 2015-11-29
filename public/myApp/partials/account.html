@@ -82,7 +82,7 @@
    <div class="panel-body" align="center">
     <div class="col-md-12">
       <ul  class="orders">
-        <li ng-repeat="order in loggedInUser.myOrders" class="thumbnail account">
+        <li ng-repeat="order in orders" class="thumbnail account">
           <font size="1">Order no:{{order.orderNum}}
            <ul  class="orders">
              <li ng-repeat="phone in order.orderedProducts" class="thumbnail account">
