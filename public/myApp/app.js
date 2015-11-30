@@ -72,7 +72,7 @@ eCommerceApp.service('UserService', function (StorageService, $location) {
  // };
 
  this.putUser = function(user) {
-  StorageService.putUser(user);
+  StorageService.putUser(user,users);
 };
 
 this.getUsers = function () {
@@ -125,7 +125,7 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
       users.splice(index, 1);
     });
   };
-  this.putUser = function(user) {
+  this.putUser = function(user,users) {
     $http.put('/api/users/' + user.id, { "name": user.name, "lastName": user.lastName, "email": user.email, "address": user.address, "password": user.password, "orders": user.orders })
     .success(function() {
       users[user.id] = user;

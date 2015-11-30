@@ -1,5 +1,4 @@
 var _ = require('lodash')
-var datastore = require('../datastore');
 
 var User = require('./user.model');  // NEW line
 function handleError(res, err) {

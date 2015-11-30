@@ -9,6 +9,5 @@ var UserSchema = new Schema({
 	password: { type: String, required: true },
 	orders: { type: Array, required: false },
 	shoppingCart: { type: Object, required: false },
-
 });
 module.exports = mongoose.model('users', UserSchema);
