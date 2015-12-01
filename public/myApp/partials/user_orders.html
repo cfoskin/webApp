@@ -1,0 +1,20 @@
+<br><br><div class="container" >
+<div class="row">
+  <div class="col-sm-4 col-sm-offset-3">
+    <h3>{{user.detail.name | uppercase}}  {{user.detail.lastName| uppercase}}'s Order History</h3> 
+  </div>
+  <table class="table table-bordered" class="thumbnail" align="center">
+    <thead>
+      <th>Oder Number</th>
+      <th>Order Status</th>
+    </thead>
+    <tr ng-repeat="order in user.detail.orders">
+     <td>{{order._id}}</td>
+     <td> {{order.dispatchStatus}} </td>
+     <td><button ng-show="order.dispatchStatus == 'Not Dispatched'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="markDispatched(order)"> Mark As Dispatched 
+     </button></td>
+   </tr>
+ </table>
+</div>
+</div>
+

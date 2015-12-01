@@ -18,3 +18,14 @@ function handleError(res, err) {
   		return res.json(201, order);
   	});
   };
+
+  // Update an existing order in datastore.
+exports.update = function(req, res) {
+  Order.findById(req.params.id, function (err, order) {
+  order.dispatchStatus = req.body.dispatchStatus;
+  order.save(function (err) {
+    if(err) { return handleError(res, err); }
+    return res.send(200, 'Update successful');
+  });
+});
+}

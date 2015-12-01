@@ -1,0 +1,33 @@
+<br> 
+<div class="container" align="center">
+  <div class="page-header">
+    <h3 align="center">
+      <div>
+      </div>
+      Welcome to the Administration  Page.
+    </h3>
+  </div>
+<div class="alert alert-danger" ng-model="warning" ng-show="warning" >
+      <strong ><p align="center">There are no users currently signed up!</strong> </p>
+    </div>
+  <table class="table table-bordered" class="thumbnail">
+   <thead >
+    <th>Name</th>
+    <th>lastName</th>
+    <th>Address</th>
+    <th>Email</th>
+    <th>Password</th>
+    <th>Orders Made</th>
+     <th>Close Users Account</th>
+  </thead>
+  <tr ng-repeat="user in users"  ng-if="user.name != 'admin'" align="center">
+    <td>{{user.name}}</td>
+    <td>{{user.lastName}}</td>
+    <td>{{user.address}}</td>
+    <td>{{user.email}}</td>
+    <td>{{user.password}}</td>
+    <td> <a href="/users/{{$index}}">View Orders</a></td>
+    <td>
+    <button class="btn btn-danger"  type="submit" ng-click= "deleteUser(user)" >Close Account</button>
+    </tr>
+  </table>
