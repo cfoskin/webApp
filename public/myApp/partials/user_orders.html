@@ -6,10 +6,12 @@
   <table class="table table-bordered" class="thumbnail" align="center">
     <thead>
       <th>Oder Number</th>
+      <th>Oder Total</th>
       <th>Order Status</th>
     </thead>
     <tr ng-repeat="order in user.detail.orders">
      <td>{{order._id}}</td>
+     <td>&euro; {{order.total}}</td>
      <td> {{order.dispatchStatus}}
     <button ng-show="order.dispatchStatus == 'Not Dispatched'" class="btn btn-xs btn-info pull-right" type="submit" ng-click="markDispatched(order)"> Mark As Dispatched 
      </button></td>

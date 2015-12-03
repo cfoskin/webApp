@@ -34,9 +34,9 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
       templateUrl: '/myApp/partials/account.html',
       controller:  'AccountController',
     })
-    .when('/completeOrder', {
-      templateUrl: '/myApp/partials/completeOrder.html',
-      controller:  'CompleteOrderController'
+    .when('/payForOrder', {
+      templateUrl: '/myApp/partials/payForOrder.html',
+      controller:  'PayForOrderController'
     })
     .when('/admin', {
       templateUrl: '/myApp/partials/admin.html',
@@ -54,8 +54,7 @@ eCommerceApp.config(['$routeProvider', '$locationProvider',
 eCommerceApp.service('UserService', function (StorageService, $location) {
   this.loggedInUser = null;
   var users = [];
-  var orders = [];
-
+  // F
   this.refreshUsers = function(){
    var promise = StorageService.getUsers();
    promise.success(function(usersData) {
@@ -113,6 +112,23 @@ this.closeAccount = function(user){
 };//end of function
 });
 
+
+//A service for storing user User Authentication
+eCommerceApp.service('OrderService', function (StorageService) {
+  var orders = [];
+
+  this.getOrder = function(orderNum){
+    return orders.filter(function(order){
+      return order.orderNum === orderNum;
+    }).pop();
+  };
+
+  this.postOrder = function(order){
+    StorageService.postOrder(order);
+  };  
+});
+
+
 //Storage service
 eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   this.getUsers = function() {
@@ -125,7 +141,8 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
     });
   };
   this.putUser = function(user,users) {
-    $http.put('/api/users/' + user.id, { "name": user.name, "lastName": user.lastName, "email": user.email, "address": user.address, "password": user.password, "orders": user.orders })
+    $http.put('/api/users/' + user.id, 
+      { "name": user.name, "lastName": user.lastName, "email": user.email, "address": user.address, "password": user.password, "orders": user.orders })
     .success(function() {
       users[user.id] = user;
     });
@@ -138,7 +155,7 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   };
 
   this.putOrder = function(order,orders) {
-    $http.put('/api/orders/' + order._id, { "userId": order.userId, "orderedProducts": order.orderedProducts, "isCompleted": order.isCompleted, "orderTotal": order.orderTotal, "orderNum": order.orderNum, "orderStatus": order.orderStatus })
+    $http.put('/api/orders/' + order._id, {"orderedProducts": order.orderedProducts, "total": order.total, "orderNum": order.orderNum, "status": order.status })
     .success(function() {
       orders[order._id] = order;
     });
@@ -167,7 +184,7 @@ eCommerceApp.factory('PhoneService', ['$http' , function($http){
     getPhone : function(id){
       return phones.filter(function(phone){
         return phone.id === id;
-      }).pop();
+      }).pop();         
     },
     loadPhone : function(id){
       return $http.get('/myApp/phones/' + id + '.json');
@@ -188,15 +205,14 @@ eCommerceApp.controller('AdminController',
       index : $routeParams.user_index, 
       detail : UserService.getUser($routeParams.user_index)
     };
-    // $scope.markDispatched = function(order){
-    //   debugger;
-    //   var orders =  $scope.user.detail.orders
-    //   order.dispatchStatus = "Dispatched";
-    //   StorageService.putOrder(order,orders);
-    //   alert("Order Marked as Dispatched");
-    // };
+    $scope.markDispatched = function(order){
+      order.dispatchStatus = "Dispatched";
+      UserService.putUser($scope.user.detail);
+      alert("Order Marked as Dispatched");
+    };
     $scope.deleteUser = function(userToDelete){
       StorageService.deleteUser(userToDelete, $scope.users);
+      alert("The Chosen Account has now being closed!");
     }
   });
 
@@ -230,7 +246,7 @@ eCommerceApp.controller('HomePageController',
 //The account controller which allows the user to finish incomplete orders, and update 
 //their password
 eCommerceApp.controller('AccountController', 
-  function ($scope,$location, UserService, PhoneService) {
+  function ($scope,$location, UserService, OrderService,PhoneService) {
     $scope.loggedInUser = UserService.loggedInUser;
     $scope.phones = PhoneService.getPhones();
     $scope.orders = $scope.loggedInUser.orders; //UserService.getOrders($scope.loggedInUser);
@@ -240,10 +256,12 @@ eCommerceApp.controller('AccountController',
 
     $scope.closeAccount = function(){
       UserService.closeAccount($scope.loggedInUser);
+      alert("Your Account has now being closed!");
       $location.path('/');
     }
-    $scope.completeOrder=  function(){
-      $location.path("/completeOrder");
+    $scope.payForOrder=  function($event){
+      $scope.order = OrderService.getOrder($event.target.id);
+      $location.path("/payForOrder");
     }
     $scope.updateUser = function () {
       if($scope.password1 === $scope.password2){
@@ -334,7 +352,7 @@ eCommerceApp.controller('PhoneDetailCtrl',
 
 //shopping cart controller for removing items or creating an order from the cart
 eCommerceApp.controller('ShoppingCartController', 
-  function ($scope,$location,UserService,PhoneService,StorageService) {
+  function ($scope,$location,UserService,PhoneService,OrderService,StorageService) {
     $scope.loggedInUser = UserService.loggedInUser;
     $scope.warning = false;//ng-show flag
     if( $scope.loggedInUser === null){
@@ -351,32 +369,28 @@ eCommerceApp.controller('ShoppingCartController',
     }
     else{
       var order = $scope.loggedInUser.createOrder();
-      debugger;
-      StorageService.postOrder(order);
+      OrderService.postOrder(order);
       UserService.putUser($scope.loggedInUser);
-      $location.path('/completeOrder');
+      $location.path('/payForOrder');
     }
   };
 });
 
 //controller to allow the use finish off the order process
-eCommerceApp.controller('CompleteOrderController', 
-  function ($scope,$location,UserService,PhoneService) {
-    $scope.loggedInUser = UserService.loggedInUser;
-    var orders = $scope.loggedInUser.orders;
-    var incompleteOrder = null;
-    orders.forEach(function(order) {
-     if(order.isCompleted === false){
-      incompleteOrder = order;
-    }
-  });
-    $scope.orderTotal = incompleteOrder.orderTotal;
-    $scope.completeOrder = function(){
-      if($scope.loggedInUser.completeOrder(incompleteOrder)){
+eCommerceApp.controller('PayForOrderController', 
+  function ($scope,$location,UserService) {
+     $scope.loggedInUser = UserService.loggedInUser;
+     $scope.loggedInUserOrders = $scope.loggedInUser.orders; //UserService.getOrders($scope.loggedInUser);
+     $scope.incompleteOrder = $scope.loggedInUserOrders[$scope.loggedInUserOrders.length -1];
+     $scope.total = $scope.incompleteOrder.total;
+
+    $scope.payForOrder = function(){
+      if($scope.loggedInUser.payForOrder($scope.incompleteOrder)){
+        UserService.putUser($scope.loggedInUser);
         alert("Order Completed");
         $location.path('/account');
       }
-    }
+     }
   });
 
 //the User model
@@ -400,18 +414,17 @@ function User(data) {
     this.shoppingCart.remove(phone);
   }
   this.createOrder = function(){
-    debugger;
     var cartTotal = this.shoppingCart.calculateTotal();
     var orderIndex = this.orders.length +1;
-    var order = new Order(this.shoppingCart.getItems(), cartTotal, orderIndex, false);
+    var order = new Order(this.shoppingCart.getItems(), cartTotal, orderIndex, 'Not Dispatched', 'incomplete');
     this.shoppingCart.emptyCart();
     this.orders.push(order);
     return order;
   }
 
-  this.completeOrder = function(incompleteOrder){
-   incompleteOrder.orderStatus = 'Completed & Shipped';
-   return incompleteOrder.isCompleted = true;
+  this.payForOrder = function(incompleteOrder){
+   incompleteOrder.status = 'Completed';
+   return true;
  }
 }
 
@@ -426,14 +439,12 @@ function Phone(data) {
 }
 
 //the Order model
-function Order(orderedProducts, orderTotal, orderNum, isCompleted) {
-  debugger;
+function Order(orderedProducts, total, orderNum,dispatchStatus,status) {
   this.orderedProducts = orderedProducts,
-  this.isCompleted = isCompleted,
-  this.orderTotal = orderTotal,
+  this.total = total,
   this.orderNum = orderNum,
-  this.dispatchStatus = 'Not Dispatched'
-  this.orderStatus = 'Incomplete'
+  this.dispatchStatus = dispatchStatus,
+  this.status = status
 };
 
 //the shopping cart model

@@ -83,15 +83,17 @@
     <div class="col-md-12">
       <ul  class="orders">
         <li ng-repeat="order in orders" class="thumbnail account">
-          <font size="1">Order no:{{order.orderNum}}
+          <font size="1">Order no:{{order.id}}
            <ul  class="orders">
-             <li ng-repeat="phone in order.orderedProducts" class="thumbnail account">
-              {{phone.id}}</li>
-              Order Total: &euro;{{order.orderTotal}}</b>
-              <p>Status: <span style="color:red"> {{order.orderStatus}}</span>
+              Order Total: &euro;{{order.total}}</b>
+              <p>Status: <span style="color:red" ng-show="order.status == 'incomplete'"> {{order.status}}</span>
+              <span style="color:greed" ng-show="order.status == 'Completed'"> {{order.status}}</span>
+              </p>
+              <p>Delivery: <span style="color:green" ng-show="order.dispatchStatus == 'Dispatched'"> {{order.dispatchStatus}}</span>
+              <span style="color:red" ng-show="order.dispatchStatus == 'Not Dispatched'"> {{order.dispatchStatus}}</span>
               </p>
             </font>
-            <button ng-show="order.orderStatus == 'Incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="completeOrder()"> Complete order
+            <button ng-show="order.status == 'incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="payForOrder($event)" id="{{order.id}}"> Complete order
             </button>
           </ul>
         </li>
