@@ -19,6 +19,7 @@ function handleError(res, err) {
          return res.json(201, user);
        });
      };
+     
 // Update an existing user in datastore.
 exports.update = function(req, res) {
   User.findById(req.params.id, function (err, user) {

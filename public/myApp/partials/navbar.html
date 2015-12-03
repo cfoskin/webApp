@@ -2,11 +2,14 @@
 role="navigation">
 <div class="collapse navbar-collapse navbar-ex1-collapse">
 	<ul class="nav navbar-nav">
-		<li ng-model="showAccount" ng-show="!showAccount">
+		<li ng-model="showAccount" ng-show="!showAccount" ng-click="signOut()">
 			<a href="/">E-Commerce App</a>
 		</li>
 		<li>
 			<a href="/products">Products</a>
+		</li>
+		<li ng-model="showAdmin" ng-show="!showAdmin">
+			<a href="/admin">Administration</a>
 		</li>
 		<li ng-model="showAccount" ng-show="showAccount">
 			<a href="#" data-toggle="dropdown" class="dropdown-toggle">Your Account

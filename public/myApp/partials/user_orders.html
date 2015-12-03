@@ -10,8 +10,8 @@
     </thead>
     <tr ng-repeat="order in user.detail.orders">
      <td>{{order._id}}</td>
-     <td> {{order.dispatchStatus}} </td>
-     <td><button ng-show="order.dispatchStatus == 'Not Dispatched'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="markDispatched(order)"> Mark As Dispatched 
+     <td> {{order.dispatchStatus}}
+    <button ng-show="order.dispatchStatus == 'Not Dispatched'" class="btn btn-xs btn-info pull-right" type="submit" ng-click="markDispatched(order)"> Mark As Dispatched 
      </button></td>
    </tr>
  </table>

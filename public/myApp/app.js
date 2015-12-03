@@ -208,10 +208,12 @@ eCommerceApp.controller('HomePageController',
    UserService.refreshUsers();
     UserService.loggedInUser = false;//using this as a flag for ng-show
     $rootScope.showAccount =  UserService.loggedInUser;
+    $rootScope.showAdmin =  true;
     $scope.signIn = function () {
       UserService.signIn($scope.signIn.email, $scope.signIn.password );
       if (UserService.loggedInUser){
-        if(UserService.loggedInUser.email === "admin@admin.com"){
+        if(UserService.loggedInUser.email === "admin"){
+          $rootScope.showAdmin =  false;
           $location.path('/admin');
         }
         else{
@@ -247,7 +249,7 @@ eCommerceApp.controller('AccountController',
       if($scope.password1 === $scope.password2){
         UserService.updateUser($scope.loggedInUser, $scope.password1);
         alert("Password Changed! - Please log in again");
-        this.signOut();
+        UserService.signOut();
       }
       else{
         $scope.warning = true;
@@ -259,9 +261,7 @@ eCommerceApp.controller('AccountController',
 eCommerceApp.controller('SignOutController', 
  function ($scope,$location, UserService,StorageService) {
   $scope.signOut = function () {
-   //var users = UserService.getUsers();
    UserService.signOut();
-   //StorageService.postUser(users);
    alert("You are now signed out")
    $location.path('/')
  }
@@ -400,6 +400,7 @@ function User(data) {
     this.shoppingCart.remove(phone);
   }
   this.createOrder = function(){
+    debugger;
     var cartTotal = this.shoppingCart.calculateTotal();
     var orderIndex = this.orders.length +1;
     var order = new Order(this.shoppingCart.getItems(), cartTotal, orderIndex, false);
@@ -426,6 +427,7 @@ function Phone(data) {
 
 //the Order model
 function Order(orderedProducts, orderTotal, orderNum, isCompleted) {
+  debugger;
   this.orderedProducts = orderedProducts,
   this.isCompleted = isCompleted,
   this.orderTotal = orderTotal,
