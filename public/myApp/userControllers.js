@@ -40,7 +40,7 @@ eCommerceApp.controller('AdminController',
     };
     $scope.markDispatched = function(order){
       order.dispatchStatus = "Dispatched";
-      UserService.putUser($scope.user.detail);
+      UserService.updateUser($scope.user.detail);
       alert("Order Marked as Dispatched");
     };
     $scope.deleteUser = function(userToDelete){
@@ -52,7 +52,7 @@ eCommerceApp.controller('AdminController',
 //The account controller which allows the user to finish incomplete orders, and update 
 //their password
 eCommerceApp.controller('AccountController', 
-  function ($scope,$location, UserService, OrderService,PhoneService) {
+  function ($scope,$location, UserService, OrderService,PhoneService,StorageService) {
     $scope.loggedInUser = UserService.loggedInUser;
     $scope.phones = PhoneService.getPhones();
     $scope.orders = $scope.loggedInUser.orders; //UserService.getOrders($scope.loggedInUser);
@@ -65,15 +65,17 @@ eCommerceApp.controller('AccountController',
       alert("Your Account has now being closed!");
       $location.path('/');
     }
-    $scope.payForOrder=  function($event){
+    $scope.payForOrder =  function($event){
       $scope.order = OrderService.getOrder($event.target.id);
       $location.path("/payForOrder");
     }
-    $scope.updateUser = function () {
+    $scope.changePassword = function () {
       if($scope.password1 === $scope.password2){
-        UserService.updateUser($scope.loggedInUser, $scope.password1);
-        alert("Password Changed! - Please log in again");
+        UserService.changePassword($scope.loggedInUser, $scope.password1);
+        UserService.updateUser($scope.loggedInUser);
         UserService.signOut();
+        alert("Password Changed! - Please log in again");
+        $location.path('/')
       }
       else{
         $scope.warning = true;

@@ -4,7 +4,7 @@ var eCommerceApp = angular.module('eCommerceApp');
 eCommerceApp.service('UserService', function (StorageService, $location) {
   this.loggedInUser = null;
   var users = [];
-  // F
+
   this.refreshUsers = function(){
    var promise = StorageService.getUsers();
    promise.success(function(usersData) {
@@ -19,7 +19,7 @@ eCommerceApp.service('UserService', function (StorageService, $location) {
  }
  return undefined
 }
-this.putUser = function(user) {
+this.updateUser = function(user) {
   StorageService.putUser(user,users);
 };
 
@@ -54,28 +54,12 @@ this.signIn = function(email, password) {
 this.signOut = function() {
  this.loggedInUser = null;
 };
-this.updateUser = function(user, newPassword) {
+this.changePassword = function(user, newPassword) {
   user.password = newPassword;
 };
 this.closeAccount = function(user){
   StorageService.deleteUser(user, users); 
 };//end of function
-});
-
-
-//A service for storing user User Authentication
-eCommerceApp.service('OrderService', function (StorageService) {
-  var orders = [];
-
-  this.getOrder = function(orderNum){
-    return orders.filter(function(order){
-      return order.orderNum === orderNum;
-    }).pop();
-  };
-
-  this.postOrder = function(order){
-    StorageService.postOrder(order);
-  };  
 });
 
 
@@ -111,6 +95,22 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
     });
   };
 }]);
+
+
+//A service for storing user User Authentication
+eCommerceApp.service('OrderService', function (StorageService) {
+  var orders = [];
+
+  this.getOrder = function(orderNum){
+    return orders.filter(function(order){
+      return order.orderNum === orderNum;
+    }).pop();
+  };
+
+  this.postOrder = function(order){
+    StorageService.postOrder(order);
+  };  
+});
 
 
 //A service for the phones
