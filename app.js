@@ -5,10 +5,8 @@ var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/userdb');
 
-require('./config/express').addMiddleware(app)
-
-
-require('./routes')(app)
+require('./config/express').addMiddleware(app);
+require('./routes')(app);
 
 // directory that serves the css, .js (static files)
 // index.html will reference relative to this folder

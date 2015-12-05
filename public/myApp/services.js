@@ -73,7 +73,7 @@ this.closeAccount = function(user){
 //Storage service
 eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   this.getUsers = function() {
-    return $http.get('/api/users/getUsers');
+    return $http.get('/api/users');
   };
   this.deleteUser = function(user, users){
     var index = users.indexOf(user);
@@ -89,10 +89,10 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
     });
   };
   this.postUser = function(users) {
-    return $http.post('/api/users/addUser', users.pop());
+    return $http.post('/api/users', users.pop());
   };
   this.postOrder = function(order){
-    $http.post('/api/orders/addOrder', order);
+    $http.post('/api/orders', order);
   };
 
   this.putOrder = function(order,orders) {
@@ -123,14 +123,14 @@ eCommerceApp.service('OrderService', function (StorageService) {
 //A service for the phones
 eCommerceApp.factory('PhoneService', ['$http' , function($http){
   var phones =[];
-  $http.get('/api/phones/getPhones').success(function(phoneData) {
+  $http.get('/api/phones').success(function(phoneData) {
     phoneData.forEach(function(data) {
       phones.push(new Phone(data));
     });
   });
   var api = {
     postPhones: function(){//used to put the phones into the db first time around.
-      $http.post('/api/phones/addPhones', phones);
+      $http.post('/api/phones/', phones);
     },
     getPhones : function() {
       return phones;
