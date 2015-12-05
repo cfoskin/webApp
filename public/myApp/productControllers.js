@@ -52,7 +52,7 @@ eCommerceApp.controller('ShoppingCartController',
     else{
       var order = $scope.loggedInUser.createOrder();
       OrderService.postOrder(order);
-      UserService.putUser($scope.loggedInUser);
+      UserService.updateUser($scope.loggedInUser);
       $location.path('/payForOrder');
     }
   };
@@ -68,7 +68,7 @@ eCommerceApp.controller('PayForOrderController',
 
     $scope.payForOrder = function(){
       if($scope.loggedInUser.payForOrder($scope.incompleteOrder)){
-        UserService.putUser($scope.loggedInUser);
+        UserService.updateUser($scope.loggedInUser);
         alert("Order Completed");
         $location.path('/account');
       }

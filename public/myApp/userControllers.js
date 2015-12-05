@@ -12,7 +12,7 @@ eCommerceApp.controller('HomePageController',
     $scope.signIn = function () {
       UserService.signIn($scope.signIn.email, $scope.signIn.password );
       if (UserService.loggedInUser){
-        if(UserService.loggedInUser.email === "admin"){
+        if(UserService.loggedInUser.role === "Admin"){
           $rootScope.showAdmin =  false;
           $location.path('/admin');
         }
@@ -102,9 +102,14 @@ eCommerceApp.controller('RegisterController', function ($scope,UserService,$loca
       $scope.warning = true;
     }
     else{
-      UserService.registerUser($scope.newUser);
-      alert("Success! Please Sign In");
-      $location.path('/');
+      UserService.registerUser($scope.newUser).success(function(){
+        UserService.refreshUsers();
+        alert("Success! Please Sign In");
+        $location.path('/');
+      }.bind(this)).error(function(err){
+        alert(err.message);
+      });
+
     }
   }
 });

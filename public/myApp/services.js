@@ -8,9 +8,13 @@ eCommerceApp.service('UserService', function (StorageService, $location) {
   this.refreshUsers = function(){
    var promise = StorageService.getUsers();
    promise.success(function(usersData) {
-  users = usersData.map(function(userData) {//create User objects from the users stored in json
-    return new User(userData);
-  });
+    users = usersData.map(function(userData) {//create User objects from the users stored in json
+    var newUser = new User(userData);
+    if(userData.name == 'admin'){
+     newUser.role = 'Admin'
+   }
+   return newUser;   
+ });
 });
  };
  this.getUser = function (index) {
@@ -19,9 +23,6 @@ eCommerceApp.service('UserService', function (StorageService, $location) {
  }
  return undefined
 }
-this.updateUser = function(user) {
-  StorageService.putUser(user,users);
-};
 
 this.getUsers = function () {
   return users;
@@ -40,11 +41,14 @@ this.checkAlreadyReg = function(userData){
   return result;
 };
 this.registerUser = function(userData) {
-  users.push(new User(userData));
-  StorageService.postUser(users).success(function(){
-    this.refreshUsers();
-  }.bind(this));
+  var newUser = new User(userData)
+  if(userData.name == 'admin'){
+   newUser.role = 'Admin'
+ }
+ users.push(newUser);
+ return StorageService.postUser(users);
 };
+
 this.signIn = function(email, password) {
   users.forEach(function(user) {
     if(user.yourCredentials(email, password))
@@ -56,6 +60,9 @@ this.signOut = function() {
 };
 this.changePassword = function(user, newPassword) {
   user.password = newPassword;
+};
+this.updateUser = function(user) {
+  StorageService.putUser(user,users);
 };
 this.closeAccount = function(user){
   StorageService.deleteUser(user, users); 
@@ -76,7 +83,7 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   };
   this.putUser = function(user,users) {
     $http.put('/api/users/' + user.id, 
-      { "name": user.name, "lastName": user.lastName, "email": user.email, "address": user.address, "password": user.password, "orders": user.orders })
+      { "role": user.role, "name": user.name, "lastName": user.lastName, "email": user.email, "address": user.address, "password": user.password, "orders": user.orders })
     .success(function() {
       users[user.id] = user;
     });

@@ -1,5 +1,9 @@
 //the User model
+
+
+
 function User(data) {
+  this.role = 'User'//will pass validation
   this.id = data._id,
   this.name = data.name || '',
   this.lastName = data.lastName || '',

@@ -23,17 +23,17 @@ function handleError(res, err) {
 // Update an existing user in datastore.
 exports.update = function(req, res) {
   User.findById(req.params.id, function (err, user) {
-  user.name = req.body.name;
-  user.lastName = req.body.lastName;
-  user.email = req.body.email;
-  user.address = req.body.address;
-  user.password = req.body.password;
-  user.orders = req.body.orders;
-  user.save(function (err) {
-    if(err) { return handleError(res, err); }
-    return res.send(200, 'Update successful');
+    user.name = req.body.name;
+    user.lastName = req.body.lastName;
+    user.email = req.body.email;
+    user.address = req.body.address;
+    user.password = req.body.password;
+    user.orders = req.body.orders;
+    user.save(function (err) {
+      if(err) { return handleError(res, err); }
+      return res.send(200, 'Update successful');
+    });
   });
-});
 }
       // Deletes a customer from datastore.
       exports.destroy = function(req, res) {
