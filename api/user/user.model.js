@@ -1,5 +1,19 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
+var validate = require('mongoose-validator');
+
+var nameValidator = [
+  validate({
+    validator: 'isLength',
+    arguments: [3, 50],
+    message: 'Name should be between {ARGS[0]} and {ARGS[1]} characters'
+  }),
+  validate({
+    validator: 'isAlphanumeric',
+    passIfEmpty: true,
+    message: 'Name should contain alpha-numeric characters only'
+  })
+];
 
 var PhoneSchema = new Schema({
 	name: { type: String, required: true },
@@ -30,7 +44,7 @@ var UserSchema = new Schema({
 	role: { 
 		type: String, enum: ['Admin','User'] , required: true
 	},
-	name: { type: String, required: true } ,
+	name: { type: String, validate: nameValidator, required: true } ,
 	lastName: { type: String, required: true },
 	email: { type: String, required: true , match: /.+\@.+\..+/},//fix register.html
 	address: { type: String, required: true } ,
@@ -38,7 +52,7 @@ var UserSchema = new Schema({
 		type: String, validate: [function(password) {
 			return password.length >= 4;
 		},
-		'Password should be longer'
+		'Password should be more than 3 characters'
 		], required: true },
 		orders: [OrderSchema],
 	});
