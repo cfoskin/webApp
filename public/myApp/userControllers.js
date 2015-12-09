@@ -1,5 +1,6 @@
-var eCommerceApp = angular.module('eCommerceApp');
+//The controllers for the application, Colum Foskin 20062042, Component Development, Applied Computing.
 
+var eCommerceApp = angular.module('eCommerceApp');
 
 //the controller for the homepage which has only logging in.
 eCommerceApp.controller('HomePageController', 
@@ -65,8 +66,8 @@ eCommerceApp.controller('AccountController',
       alert("Your Account has now being closed!");
       $location.path('/');
     }
-    $scope.payForOrder =  function($event){
-      $scope.order = OrderService.getOrder($event.target.id);
+    $scope.payForOrder =  function(){
+      //$scope.order = OrderService.getOrder($event.target.id);
       $location.path("/payForOrder");
     }
     $scope.changePassword = function () {

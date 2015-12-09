@@ -1,6 +1,8 @@
+//The services for the application Colum Foskin 20062042, Component Development, Applied Computing.
+
 var eCommerceApp = angular.module('eCommerceApp');
 
-//A service for storing user User Authentication
+//A service for all things user related.
 eCommerceApp.service('UserService', function (StorageService, $location) {
   this.loggedInUser = null;
   var users = [];
@@ -66,11 +68,11 @@ this.updateUser = function(user) {
 };
 this.closeAccount = function(user){
   StorageService.deleteUser(user, users); 
-};//end of function
+};
 });
 
 
-//Storage service
+//Storage service that interacts with the db.
 eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
   this.getUsers = function() {
     return $http.get('/api/users');
@@ -104,9 +106,12 @@ eCommerceApp.service('StorageService', ['$http' , function ($http, UserService){
 }]);
 
 
-//A service for storing user User Authentication
+//A service for the Orders
 eCommerceApp.service('OrderService', function (StorageService) {
   var orders = [];
+  this.getOrders = function(){
+    return orders;
+  }
 
   this.getOrder = function(orderNum){
     return orders.filter(function(order){

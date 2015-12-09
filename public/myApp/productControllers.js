@@ -1,5 +1,6 @@
-var eCommerceApp = angular.module('eCommerceApp');
+//The controllers for products of the application, Colum Foskin 20062042, Component Development, Applied Computing.
 
+var eCommerceApp = angular.module('eCommerceApp');
 
 //product page controller which allows a use to add an item to their cart
 eCommerceApp.controller('ProductPageController', function ($scope,$location,PhoneService, UserService) { 
@@ -61,16 +62,21 @@ eCommerceApp.controller('ShoppingCartController',
 //controller to allow the use finish off the order process
 eCommerceApp.controller('PayForOrderController', 
   function ($scope,$location,UserService) {
-     $scope.loggedInUser = UserService.loggedInUser;
-     $scope.loggedInUserOrders = $scope.loggedInUser.orders; //UserService.getOrders($scope.loggedInUser);
-     $scope.incompleteOrder = $scope.loggedInUserOrders[$scope.loggedInUserOrders.length -1];
+   $scope.loggedInUser = UserService.loggedInUser;
+     $scope.loggedInUserOrders = $scope.loggedInUser.orders; 
+     $scope.incompleteOrder = null;
+     debugger;
+     $scope.loggedInUserOrders.forEach(function(order) {
+       if(order.status === 'incomplete'){
+        $scope.incompleteOrder = order;
+      }
+    });
      $scope.total = $scope.incompleteOrder.total;
-
-    $scope.payForOrder = function(){
+     $scope.payForOrder = function(){
       if($scope.loggedInUser.payForOrder($scope.incompleteOrder)){
         UserService.updateUser($scope.loggedInUser);
         alert("Order Completed");
         $location.path('/account');
       }
-     }
+    }
   });

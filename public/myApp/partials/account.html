@@ -93,7 +93,7 @@
               <span style="color:red" ng-show="order.dispatchStatus == 'Not Dispatched'"> {{order.dispatchStatus}}</span>
               </p>
             </font>
-            <button ng-show="order.status == 'incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="payForOrder($event)" id="{{order.id}}"> Complete order
+            <button ng-show="order.status == 'incomplete'" class="btn btn-xs btn-info btn-block" type="submit" ng-click="payForOrder()"> Complete order
             </button>
           </ul>
         </li>

@@ -1,5 +1,4 @@
-//the User model
-
+//The models for the application, Colum Foskin 20062042, Component Development, Applied Computing.
 
 
 function User(data) {
